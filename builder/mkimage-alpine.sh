@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# This mkimage-alpine.sh is a modified version from
+# https://github.com/docker/docker/blob/master/contrib/mkimage-alpine.sh.
+# Changes were inspired by work done by Eivind Uggedal (uggedal) and
+# Luis Lavena luislavena.
+
 set -e
 [ $TRACE ] && set -x
 
@@ -68,8 +73,4 @@ SAVE=${SAVE:-0}
 REPO=$MIRROR/$REL/main
 ARCH=$(uname -m)
 
-tmp
-getapk
-mkbase
-conf
-save
+tmp && getapk && mkbase && conf && save
