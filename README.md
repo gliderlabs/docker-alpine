@@ -47,14 +47,14 @@ RUN apt-get update -q \
   && DEBIAN_FRONTEND=noninteractive apt-get install -qy mysql-client \
   && apt-get clean \
   && rm -rf /var/lib/apt
-ENTRYPOINT ["mysql-client"]
+ENTRYPOINT ["mysql"]
 ```
 This took 19 seconds to build and yields a 164 MB image. Eww. Start doing this:
 
 ```
 FROM gliderlabs/alpine:3.1
 RUN apk-install mysql-client
-ENTRYPOINT ["mysql-client"]
+ENTRYPOINT ["mysql"]
 ```
 
 Only 3 seconds to build and results in a 16 MB image! Hooray!
