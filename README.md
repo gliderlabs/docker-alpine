@@ -46,13 +46,13 @@ Use the `build` sub-command of the `alpine` utility to build the images:
 ```console
 $ ./alpine build
 -----> Building Alpine Linux Docker images ...
-Building image for the rootfs mkimage script ... done
-Building release edge ... done
-Tagging release edge as alpine:edge
+       Building image for the rootfs mkimage script ... done
+       Building release edge ... done
+       Tagging release edge as alpine:edge
 =====> Finished building release edge
-Building release v3.1 ... done
-Tagging release v3.1 as alpine:3.1
-Tagging release v3.1 as alpine:latest
+       Building release v3.1 ... done
+       Tagging release v3.1 as alpine:3.1
+       Tagging release v3.1 as alpine:latest
 =====> Finished building release v3.1
 ```
 
@@ -67,8 +67,8 @@ Use the `test` sub-command of the `alpine` utility to run tests on currently bui
 ```console
 $ ./alpine test
 -----> Testing images ...
-Testing image alpine:edge ... passed
-Testing image alpine:3.1 ... passed
+       Testing image alpine:edge ... passed
+       Testing image alpine:3.1 ... passed
 ```
 
 ## Inspiration
