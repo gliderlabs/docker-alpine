@@ -15,11 +15,6 @@ dependencies:
     - mkdir -p ~/docker; docker save alpine-builder > ~/docker/builder.tar
     - docker images
 
-test:
-  override:
-    - docker run gliderlabs/alpine:edge true
-    - docker run gliderlabs/alpine:3.1.1 true
-
 deployment:
   hub:
     branch: master
