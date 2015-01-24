@@ -1,0 +1,41 @@
+#!/bin/bash
+
+set -e
+[[ $TRACE ]] && set -x
+
+VERSIONS="versions/edge versions/3.1"
+BUILD_IMAGE="alpine-builder"
+BUILD_PREFIX="alpine-build-"
+MASTER_IMAGE="alpine"
+MIRROR="http://dl-4.alpinelinux.org/alpine"
+
+check-docker() {
+  if [[ -z $(which docker) ]]; then
+    echo "Missing docker client which is required for building"
+    exit 2
+  fi
+}
+
+build() {
+  files="$@"
+  check-docker
+  docker build -t "$BUILD_IMAGE" builder
+
+  for file in $files; do
+    local release="$(head -1 $file)"
+    local tag="$(basename $file)"
+    local build="${BUILD_PREFIX}${tag}"
+
+    docker rm "$build" || true
+    docker run --name "$build" "$BUILD_IMAGE" \
+      -s \
+      -r "$release" \
+      -m "$MIRROR"
+    docker cp "$build":/rootfs.tar.xz .
+    docker build -t "$MASTER_IMAGE":"$version" .
+    docker rm "$build" || true
+    rm -f rootfs.tar.xz
+  done
+}
+
+build "${@:-$VERSIONS}"
