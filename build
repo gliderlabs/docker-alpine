@@ -3,10 +3,11 @@
 set -e
 [[ $TRACE ]] && set -x
 
-VERSIONS="versions/edge versions/3.1"
+VERSIONS="./versions/*"
 BUILD_IMAGE="alpine-builder"
-BUILD_PREFIX="alpine-build-"
 MASTER_IMAGE="alpine"
+BUILD_PREFIX="alpine-build-"
+PREFIXES="gliderlabs myfakeorg"
 MIRROR="http://dl-4.alpinelinux.org/alpine"
 
 check-docker() {
@@ -22,17 +23,25 @@ build() {
   docker build -t "$BUILD_IMAGE" builder
 
   for file in $files; do
-    local release="$(head -1 $file)"
-    local tag="$(basename $file)"
-    local build="${BUILD_PREFIX}${tag}"
+    local tags="$(cat $file)"
+    local release="$(basename $file)"
+    local build="${BUILD_PREFIX}${release}"
 
+    : ${build:?} ${tags:?} ${release:?}
     docker rm "$build" || true
     docker run --name "$build" "$BUILD_IMAGE" \
       -s \
       -r "$release" \
       -m "$MIRROR"
     docker cp "$build":/rootfs.tar.xz .
-    docker build -t "$MASTER_IMAGE":"$version" .
+    docker build -t "$MASTER_IMAGE" .
+
+    for tag in $tags; do
+      for prefix in $PREFIXES; do
+        docker tag -f "$MASTER_IMAGE" "$prefix":"$tag"
+      done
+    done
+
     docker rm "$build" || true
     rm -f rootfs.tar.xz
   done
