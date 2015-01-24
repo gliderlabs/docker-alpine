@@ -37,6 +37,28 @@ OK: 21 MiB in 20 packages
 
 This makes Alpine Linux a great image base for utilities and even production applications. [Read more about Alpine Linux here][alpine-about] and you can see how their mantra fits in right at home with Docker images.
 
+## Usage
+
+Stop doing this:
+
+```
+FROM ubuntu-debootstrap:14.04
+RUN apt-get update -q \
+  && DEBIAN_FRONTEND=noninteractive apt-get install -qy mysql-client \
+  && apt-get clean \
+  && rm -rf /var/lib/apt
+ENTRYPOINT ["mysql-client"]
+```
+This took 19 seconds to build and yields a 164 MB image. Eww. Start doing this:
+
+```
+FROM gliderlabs/alpine:3.1
+RUN apk-install mysql-client
+ENTRYPOINT ["mysql-client"]
+```
+
+Only 3 seconds to build and results in a 16 MB image! Hooray!
+
 ## Build
 
 Each build has a version file in the `versions` folder. The file name is the Alpine Linux release to build and the contents of the file are the image tags to apply once built (one tag per line).
