@@ -15,6 +15,10 @@ dependencies:
     - mkdir -p ~/docker; docker save alpine-builder > ~/docker/builder.tar
     - docker images
 
+test:
+  override:
+    - docker run alpine apk add --update openssl
+
 deployment:
   hub:
     branch: master
