@@ -1,6 +1,6 @@
 # docker-alpine
 
-[![CircleCI](https://img.shields.io/circleci/project/gliderlabs/docker-alpine.svg)](https://circleci.com/gh/gliderlabs/docker-alpine)
+[![CircleCI](https://img.shields.io/circleci/project/gliderlabs/docker-alpine/master.svg)](https://circleci.com/gh/gliderlabs/docker-alpine)
 
 A super small Docker image based on Alpine Linux. The image is only 5 MB and has access to a package repository that is much more complete than other BusyBox based images.
 
@@ -63,34 +63,22 @@ Only 3 seconds to build and results in a 16 MB image! Hooray!
 
 Each build has a version file in the `versions` folder. The file name is the Alpine Linux release to build and the contents of the file are the image tags to apply once built (one tag per line).
 
-Use the `build` sub-command of the `alpine` utility to build the images:
+Use the `build` utility to build the images:
 
 ```console
-$ ./alpine build
------> Building Alpine Linux Docker images ...
-       Building image for the rootfs mkimage script ... done
-       Building release edge ... done
-       Tagging release edge as alpine:edge
-=====> Finished building release edge
-       Building release v3.1 ... done
-       Tagging release v3.1 as alpine:3.1
-       Tagging release v3.1 as alpine:latest
-=====> Finished building release v3.1
+$ ./build
 ```
 
-The build utility takes a list of files or glob as an argument. You could build just the edge version using `./alpine build versions/edge`.
+The build utility takes a list of files or glob as an argument. You could build just the edge version using `./build versions/edge`.
 
 ## Test
 
 The test for images is very simple at the moment. It just attempts to install the `openssl` package and verify we exit cleanly.
 
-Use the `test` sub-command of the `alpine` utility to run tests on currently build images:
+Use the `test` sub-command of the `build` utility to run tests on currently build images:
 
 ```console
-$ ./alpine test
------> Testing images ...
-       Testing image alpine:edge ... passed
-       Testing image alpine:3.1 ... passed
+$ ./build test
 ```
 
 ## Inspiration
