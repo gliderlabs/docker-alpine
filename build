@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+
+BUILD_IMAGE="${BUILD_IMAGE:-alpine-builder}"
+BUILD_PREFIX="${BUILD_PREFIX:-alpine-build-}"
+PREFIXES="${PREFIXES:-alpine}"
+MIRROR="${MIRROR:-http://dl-4.alpinelinux.org/alpine}"
+VERSIONS="${VERSIONS:-versions/*}"
+
+build() {
+	declare desc="Build Alpine Linux Docker images"
+	declare version_files="${@:-$VERSIONS}"
+	: ${version_files:?}
+
+	if [[ -z $(which docker) ]]; then
+		echo "Missing docker client which is required for building"
+		exit 2
+	fi
+
+	docker build -t "$BUILD_IMAGE" builder
+
+	for file in $version_files; do
+		echo $file
+		local tags="$(cat $file)"
+		local release="$(basename $file)"
+		local build="${BUILD_PREFIX}${release}"
+		local master="$(echo $PREFIXES | cut -d' ' -f1)"
+
+		: ${build:?} ${tags:?} ${release:?}
+
+		docker rm "$build" || true
+
+		docker run --name "$build" "$BUILD_IMAGE" \
+		-s \
+		-r "$release" \
+		-m "$MIRROR"
+		docker cp "$build":/rootfs.tar.xz .
+		docker build -t "$master" .
+
+		for tag in $tags; do
+			for prefix in $PREFIXES; do
+				docker tag -f "$master" "$prefix":"$tag"
+			done
+		done
+
+		docker rm "$build" || true
+		rm -f rootfs.tar.xz
+	done
+}
+
+test() {
+	declare desc="Run tests against images"
+	declare version_files="${@:-$VERSIONS}"
+	local master="$(echo $PREFIXES | cut -d' ' -f1)"
+	for file in $version_files; do
+		local tag="$(head -1 $file)"
+		if $(docker inspect "$master":"$tag" >/dev/null 2>&1); then
+			docker run "$master":"$tag" apk add --update openssl || exit 1
+		fi
+	done
+}
+
+main() {
+	set -eo pipefail; [[ "$TRACE" ]] && set -x
+	cmd="$1"
+	case "$cmd" in
+		test)		shift; test $@;;
+		*)			build $@;;
+	esac
+}
+
+main "$@"
