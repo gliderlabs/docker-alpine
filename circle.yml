@@ -1,0 +1,28 @@
+machine:
+  services:
+    - docker
+
+dependencies:
+  cache_directories:
+    - "~/docker"
+  override:
+    - docker info
+    - if [[ -e ~/docker/builder.tar ]]; then docker load --input ~/docker/builder.tar; fi
+    - ./build:
+        parallel: true
+        files:
+          - versions/*
+    - mkdir -p ~/docker; docker save alpine-builder > ~/docker/builder.tar
+    - docker images
+
+test:
+  override:
+    - docker run gliderlabs/alpine:edge true
+    - docker run gliderlabs/alpine:3.1.1 true
+
+deployment:
+  hub:
+    branch: master
+    commands:
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASSWORD
+      - docker push gliderlabs/alpine
