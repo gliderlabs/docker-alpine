@@ -85,6 +85,10 @@ $ ./build test
 
 The motivation for this project and modifications to `mkimage.sh` are highly inspired by Eivind Uggedal (uggedal) and Luis Lavena (luislavena). They have made great strides in getting Alpine Linux running as a Docker container. Check out their [mini-container/base][mini-base] image as well.
 
+## License
+
+The code in this repository, unless otherwise noted, is BSD licensed. See the `LICENSE` file in this repository.
+
 [mini-base]: https://github.com/mini-containers/base
 [alpine-packages]: http://forum.alpinelinux.org/packages
 [alpine-about]: https://www.alpinelinux.org/about/
