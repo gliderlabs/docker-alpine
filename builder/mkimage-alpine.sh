@@ -3,7 +3,7 @@
 # This mkimage-alpine.sh is a modified version from
 # https://github.com/docker/docker/blob/master/contrib/mkimage-alpine.sh.
 # Changes were inspired by work done by Eivind Uggedal (uggedal) and
-# Luis Lavena luislavena.
+# Luis Lavena (luislavena).
 
 set -e
 [ $TRACE ] && set -x
