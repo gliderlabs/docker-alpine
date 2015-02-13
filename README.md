@@ -59,28 +59,6 @@ ENTRYPOINT ["mysql"]
 
 Only 3 seconds to build and results in a 16 MB image! Hooray!
 
-## Build
-
-Each build has a version file in the `versions` folder. The file name is the Alpine Linux release to build and the contents of the file are the image tags to apply once built (one tag per line).
-
-Use the `build` utility to build the images:
-
-```console
-$ ./build
-```
-
-The build utility takes a list of files or glob as an argument. You could build just the edge version using `./build versions/edge`.
-
-## Test
-
-The test for images is very simple at the moment. It just attempts to install the `openssl` package and verify we exit cleanly.
-
-Use the `test` sub-command of the `build` utility to run tests on currently build images:
-
-```console
-$ ./build test
-```
-
 ## Inspiration
 
 The motivation for this project and modifications to `mkimage.sh` are highly inspired by Eivind Uggedal (uggedal) and Luis Lavena (luislavena). They have made great strides in getting Alpine Linux running as a Docker container. Check out their [mini-container/base][mini-base] image as well.
