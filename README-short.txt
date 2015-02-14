@@ -1,1 +1,1 @@
-A super small Docker image based on Alpine Linux. The image is only 5 MB and has access to a package repository that is much more complete than other BusyBox based images.
+A minimal Docker image based on Alpine Linux with a complete package index and only 5 MB in size!
