@@ -14,7 +14,7 @@ set -e
 }
 
 usage() {
-	printf >&2 '%s: [-r release] [-m mirror] [-s]\n' "$0"
+	printf >&2 '%s: [-r release] [-m mirror] [-s] [-e]\n' "$0"
 	exit 1
 }
 
@@ -41,6 +41,10 @@ mkbase() {
 
 conf() {
 	printf '%s\n' $REPO > $ROOTFS/etc/apk/repositories
+	[ $REPO_EXTRA -eq 1 ] && {
+		[ $REL = "edge" ] || printf '%s\n' "@edge $MIRROR/edge/main" >> $ROOTFS/etc/apk/repositories
+		printf '%s\n' "@testing $MIRROR/edge/testing" >> $ROOTFS/etc/apk/repositories
+	}
 	rm -f $ROOTFS/var/cache/apk/*
 }
 
@@ -50,7 +54,7 @@ save() {
 	tar --numeric-owner -C $ROOTFS -c . | xz > rootfs.tar.xz
 }
 
-while getopts "hr:m:s" opt; do
+while getopts "hr:m:se" opt; do
 	case $opt in
 		r)
 			REL=$OPTARG
@@ -60,6 +64,9 @@ while getopts "hr:m:s" opt; do
 			;;
 		s)
 			SAVE=1
+			;;
+		e)
+			REPO_EXTRA=1
 			;;
 		*)
 			usage
@@ -71,6 +78,7 @@ REL=${REL:-edge}
 MIRROR=${MIRROR:-http://nl.alpinelinux.org/alpine}
 SAVE=${SAVE:-0}
 REPO=$MIRROR/$REL/main
+REPO_EXTRA=${REPO_EXTRA:-0}
 ARCH=$(uname -m)
 
 tmp && getapk && mkbase && conf && save
