@@ -1,6 +1,6 @@
 # Build
 
-[![CircleCI](https://img.shields.io/circleci/project/gliderlabs/docker-alpine/master.svg)](https://circleci.com/gh/gliderlabs/docker-alpine)
+[![CircleCI](https://img.shields.io/circleci/project/gliderlabs/docker-alpine/release.svg)](https://circleci.com/gh/gliderlabs/docker-alpine)
 
 A convenience `build` script is included that builds the image and runs basic tests against the resulting image tags. The script is used in the continuous integration process (check out the CircleCI badge badge link above). But you can run this script locally to build your own images. Be sure to check out the environment variables that can be tweaked at the top of the `build` script file.
 
