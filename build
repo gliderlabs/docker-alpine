@@ -1,15 +1,14 @@
 #!/usr/bin/env bash
 
-BUILD_IMAGE="${BUILD_IMAGE:-alpine-builder}"
-BUILD_PREFIX="${BUILD_PREFIX:-alpine-build-}"
-PREFIXES="${PREFIXES:-alpine}"
-MIRROR="${MIRROR:-http://dl-4.alpinelinux.org/alpine}"
-VERSIONS="${VERSIONS:-versions/*}"
+declare BUILD_IMAGE="${BUILD_IMAGE:-alpine-builder}"
+declare BUILD_PREFIX="${BUILD_PREFIX:-alpine-build-}"
+declare PREFIXES="${PREFIXES:-alpine}"
+declare MIRROR="${MIRROR:-http://dl-4.alpinelinux.org/alpine}"
+declare VERSIONS="${VERSIONS:-versions/*}"
 
 build() {
-	declare desc="Build Alpine Linux Docker images"
-	declare version_files="${@:-$VERSIONS}"
-	: ${version_files:?}
+	declare version_files="${*:-$VERSIONS}"
+	: "${version_files:?}"
 
 	if [[ -z $(which docker) ]]; then
 		echo "Missing docker client which is required for building"
@@ -19,12 +18,12 @@ build() {
 	docker build -t "$BUILD_IMAGE" builder
 
 	for file in $version_files; do
-		local tags="$(cat $file)"
-		local release="$(basename $file)"
+		local tags="$(cat "$file")"
+		local release="$(basename "$file")"
 		local build="${BUILD_PREFIX}${release}"
-		local master="$(echo $PREFIXES | cut -d' ' -f1):master"
+		local master="$(echo "$PREFIXES" | cut -d' ' -f1):master"
 
-		: ${build:?} ${tags:?} ${release:?}
+		: "${build:?}" "${tags:?}" "${release:?}"
 
 		docker run --name "$build" "$BUILD_IMAGE" \
 			-s \
@@ -35,10 +34,10 @@ build() {
 
 		for tag in $tags; do
 			for prefix in $PREFIXES; do
-				docker tag -f "$master" "$prefix":"$tag"
+				docker tag -f "$master" "${prefix}:${tag}"
 				if [[ "$SAVE_IMAGES" ]]; then
 					mkdir -p images
-					docker save "$prefix":"$tag" \
+					docker save "${prefix}:${tag}" \
 						| gzip -c > "images/${prefix//\//_}_${tag}.tar.gz"
 				fi
 			done
@@ -51,13 +50,12 @@ build() {
 }
 
 test() {
-	declare desc="Run tests against images"
-	declare version_files="${@:-$VERSIONS}"
-	local master="$(echo $PREFIXES | cut -d' ' -f1)"
+	declare version_files="${*:-$VERSIONS}"
+	local repo="$(echo "$PREFIXES" | cut -d' ' -f1)"
 	for file in $version_files; do
-		local tag="$(head -1 $file)"
-		if $(docker inspect "$master":"$tag" >/dev/null 2>&1); then
-			docker run "$master":"$tag" apk add --update openssl || exit 1
+		local tag="$(head -1 "$file")"
+		if docker inspect "${repo}:${tag}" >/dev/null 2>&1; then
+			docker run "${repo}:${tag}" apk add --update openssl || exit 1
 		fi
 	done
 }
@@ -66,8 +64,8 @@ main() {
 	set -eo pipefail; [[ "$TRACE" ]] && set -x
 	cmd="$1"
 	case "$cmd" in
-		test)		shift; test $@;;
-		*)			build $@;;
+		test)		shift; test "$@";;
+		*)			build "$@";;
 	esac
 }
 
