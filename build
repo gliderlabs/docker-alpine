@@ -35,10 +35,10 @@ build() {
 		for tag in $tags; do
 			for prefix in $PREFIXES; do
 				docker tag -f "$master" "${prefix}:${tag}"
-				if [[ "$SAVE_IMAGES" ]]; then
+				if [[ "$CIRCLE_BUILD_NUM" ]]; then
 					mkdir -p images
 					docker save "${prefix}:${tag}" \
-						| gzip -c > "images/${prefix//\//_}_${tag}.tar.gz"
+						| gzip -c > "images/${prefix//\//_}_${tag}_build-${CIRCLE_BUILD_NUM}.tar.gz"
 				fi
 			done
 		done
