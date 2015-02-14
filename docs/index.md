@@ -1,6 +1,6 @@
 # Alpine Linux Docker Image
 
-[![CircleCI](https://img.shields.io/circleci/project/gliderlabs/docker-alpine/master.svg)](https://circleci.com/gh/gliderlabs/docker-alpine)
+[![CircleCI](https://img.shields.io/circleci/project/gliderlabs/docker-alpine/release.svg)](https://circleci.com/gh/gliderlabs/docker-alpine)
 
 Welcome to the documentation for the Alpine Linux Docker Image. Here we explain a bit about the motivations behind this image, how you typically use it, the build process, and how to make great minimalist containers!
 
@@ -22,7 +22,7 @@ This image is built and tested in a continuous integration environment using the
 
 ## Contributing
 
-We welcome contributions to the image build process, version bumps, and other optimizations. The image gets built and pushed from master automatically. Once a pull request is merged, a build will be kicked off, and resulting image pushed to Docker Hub in a matter of minutes!
+We welcome contributions to the image build process, version bumps, and other optimizations. The image gets built and pushed from the `release` branch automatically. Once a pull request is merged, a build will be kicked off, and resulting image pushed to Docker Hub in a matter of minutes!
 
 [about]: /docker-alpine/about
 [usage]: /docker-alpine/usage
