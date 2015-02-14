@@ -39,6 +39,11 @@ build() {
 		for tag in $tags; do
 			for prefix in $PREFIXES; do
 				docker tag -f "$master" "$prefix":"$tag"
+				if [[ "$SAVE_IMAGES" ]]; then
+					mkdir -p images
+					docker save "$prefix":"$tag" \
+						| gzip -c > "images/${prefix//\//_}_${tag}.tar.gz"
+				fi
 			done
 		done
 

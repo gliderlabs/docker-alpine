@@ -1,3 +1,7 @@
+general:
+  artifacts:
+    - "images"
+
 machine:
   services:
     - docker
