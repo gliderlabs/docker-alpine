@@ -19,20 +19,17 @@ build() {
 	docker build -t "$BUILD_IMAGE" builder
 
 	for file in $version_files; do
-		echo $file
 		local tags="$(cat $file)"
 		local release="$(basename $file)"
 		local build="${BUILD_PREFIX}${release}"
-		local master="$(echo $PREFIXES | cut -d' ' -f1)"
+		local master="$(echo $PREFIXES | cut -d' ' -f1):master"
 
 		: ${build:?} ${tags:?} ${release:?}
 
-		docker rm "$build" || true
-
 		docker run --name "$build" "$BUILD_IMAGE" \
-		-s \
-		-r "$release" \
-		-m "$MIRROR"
+			-s \
+			-r "$release" \
+			-m "$MIRROR"
 		docker cp "$build":/rootfs.tar.xz .
 		docker build -t "$master" .
 
@@ -48,6 +45,7 @@ build() {
 		done
 
 		docker rm "$build" || true
+		docker rmi "$master" || true
 		rm -f rootfs.tar.xz
 	done
 }
