@@ -1,8 +1,8 @@
 # docker-alpine
 
-[![CircleCI](https://img.shields.io/circleci/project/gliderlabs/docker-alpine/release.svg)](https://circleci.com/gh/gliderlabs/docker-alpine)
+[![CircleCI](https://img.shields.io/circleci/project/gliderlabs/docker-alpine/release.svg)](https://circleci.com/gh/gliderlabs/docker-alpine) [![Docker Hub](https://img.shields.io/badge/docker-ready-blue.svg)](https://registry.hub.docker.com/u/gliderlabs/alpine/) [![IRC Channel](https://img.shields.io/badge/irc-%23gliderlabs-blue.svg)]()
 
-A super small Docker image based on Alpine Linux. The image is only 5 MB and has access to a package repository that is much more complete than other BusyBox based images.
+A super small Docker image based on [Alpine Linux][alpine]. The image is only 5 MB and has access to a package repository that is much more complete than other BusyBox based images.
 
 ## Why?
 
@@ -63,6 +63,10 @@ Only 3 seconds to build and results in a 16 MB image! Hooray!
 
 This image is well documented. [Check out the documentation at Viewdocs][docs] and the `docs` directory in this repository.
 
+## Support
+
+We make reasonable efforts to support our work and are always happy to chat. Feel free to join us in [#gliderlabs on Freenode][irc] or [submit an issue][issues] to this GitHub repository.
+
 ## Inspiration
 
 The motivation for this project and modifications to `mkimage.sh` are highly inspired by Eivind Uggedal (uggedal) and Luis Lavena (luislavena). They have made great strides in getting Alpine Linux running as a Docker container. Check out their [mini-container/base][mini-base] image as well.
@@ -75,3 +79,6 @@ The code in this repository, unless otherwise noted, is BSD licensed. See the `L
 [alpine-packages]: http://forum.alpinelinux.org/packages
 [alpine-about]: https://www.alpinelinux.org/about/
 [docs]: http://gliderlabs.viewdocs.io/docker-alpine
+[irc]: irc://irc.freenode.net/#gliderlabs
+[issues]: https://github.com/gliderlabs/docker-alpine/issues
+[alpine]: http://alpinelinux.org/
