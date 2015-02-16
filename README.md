@@ -1,6 +1,6 @@
 # docker-alpine
 
-[![CircleCI](https://img.shields.io/circleci/project/gliderlabs/docker-alpine/release.svg)](https://circleci.com/gh/gliderlabs/docker-alpine) [![Docker Hub](https://img.shields.io/badge/docker-ready-blue.svg)](https://registry.hub.docker.com/u/gliderlabs/alpine/) [![IRC Channel](https://img.shields.io/badge/irc-%23gliderlabs-blue.svg)](irc)
+[![CircleCI](https://img.shields.io/circleci/project/gliderlabs/docker-alpine/release.svg)](https://circleci.com/gh/gliderlabs/docker-alpine) [![Docker Hub](https://img.shields.io/badge/docker-ready-blue.svg)](https://registry.hub.docker.com/u/gliderlabs/alpine/) [![IRC Channel](https://img.shields.io/badge/irc-%23gliderlabs-blue.svg)][irc]
 
 A super small Docker image based on [Alpine Linux][alpine]. The image is only 5 MB and has access to a package repository that is much more complete than other BusyBox based images.
 
@@ -79,6 +79,6 @@ The code in this repository, unless otherwise noted, is BSD licensed. See the `L
 [alpine-packages]: http://forum.alpinelinux.org/packages
 [alpine-about]: https://www.alpinelinux.org/about/
 [docs]: http://gliderlabs.viewdocs.io/docker-alpine
-[irc]: irc://irc.freenode.net/#gliderlabs
+[irc]: https://kiwiirc.com/client/irc.freenode.net/#gliderlabs
 [issues]: https://github.com/gliderlabs/docker-alpine/issues
 [alpine]: http://alpinelinux.org/
