@@ -40,7 +40,7 @@ FROM gliderlabs/alpine:3.1
 RUN apk-install nginx
 
 EXPOSE 80
-CMD ["nginx"]
+CMD ["nginx", "-g", "daemon off;"]
 ```
 
 ## Vitual Packages
