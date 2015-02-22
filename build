@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 
+declare BUILD_MASTER="${BUILD_MASTER}"
 declare BUILD_IMAGE="${BUILD_IMAGE:-alpine-builder}"
 declare BUILD_PREFIX="${BUILD_PREFIX:-alpine-build-}"
 declare PREFIXES="${PREFIXES:-gliderlabs/alpine}"
 declare MIRROR="${MIRROR:-http://dl-4.alpinelinux.org/alpine}"
-declare VERSIONS="${VERSIONS:-versions/*}"
+declare VERSIONS="${VERSIONS:-versions/**/tags}"
 
 build() {
-	declare version_files="${*:-$VERSIONS}"
-	: "${version_files:?}"
+	declare tag_files="${*:-$VERSIONS}"
+	: "${tag_files:?}"
 
 	if [[ -z $(which docker) ]]; then
 		echo "Missing docker client which is required for building"
@@ -17,42 +18,67 @@ build() {
 
 	docker build -t "$BUILD_IMAGE" builder
 
-	for file in $version_files; do
+	for file in $tag_files; do
 		local tags="$(cat "$file")"
-		local release="$(basename "$file")"
+		local release="$(basename "$(dirname "$file")")"
 		local build="${BUILD_PREFIX}${release}"
 		local master="$(echo "$PREFIXES" | cut -d' ' -f1):master"
+		local version_dir="$(dirname "$file")"
 
 		: "${build:?}" "${tags:?}" "${release:?}"
 
+		docker rm "$build" 2>/dev/null || true
+
 		docker run --name "$build" "$BUILD_IMAGE" \
 			-s \
+			-c \
 			-r "$release" \
 			-m "$MIRROR"
-		docker cp "$build":/rootfs.tar.xz .
-		docker build -t "$master" .
+		docker cp "$build":/rootfs.tar.xz "./$version_dir/"
 
-		for tag in $tags; do
-			for prefix in $PREFIXES; do
-				docker tag -f "$master" "${prefix}:${tag}"
-				if [[ "$CIRCLE_BUILD_NUM" ]]; then
-					mkdir -p images
-					docker save "${prefix}:${tag}" \
-						| gzip -c > "images/${prefix//\//_}_${tag}_build-${CIRCLE_BUILD_NUM}.tar.gz"
-				fi
+		if [[ "$BUILD_MASTER" ]]; then
+			docker build -t "$master" "./$version_dir/"
+
+			for tag in $tags; do
+				for prefix in $PREFIXES; do
+					docker tag -f "$master" "${prefix}:${tag}"
+					if [[ "$CIRCLE_BUILD_NUM" ]]; then
+						mkdir -p images
+						docker save "${prefix}:${tag}" \
+							| gzip -c > "images/${prefix//\//_}_${tag}_build-${CIRCLE_BUILD_NUM}.tar.gz"
+					fi
+				done
 			done
-		done
+			docker rmi "$master" || true
+		fi
 
 		docker rm "$build" || true
-		docker rmi "$master" || true
-		rm -f rootfs.tar.xz
+	done
+}
+
+commit() {
+	declare tag_files="${*:-$VERSIONS}"
+	local build_num="${CIRCLE_BUILD_NUM:-nobuild}"
+
+	for file in $tag_files; do
+		local release="$(basename "$(dirname "$file")")"
+		local version_dir="$(dirname "$file")"
+		local current_branch=$(git rev-parse --abbrev-ref HEAD)
+
+		: "${release:?}"
+
+		git checkout -B "rootfs-$release"
+		git add -f -- "./$version_dir/rootfs.tar.xz"
+		git commit -m "pushing release $release for build $build_num"
+		git push -f origin "rootfs-$release"
+		git checkout "$current_branch"
 	done
 }
 
 test() {
-	declare version_files="${*:-$VERSIONS}"
+	declare tag_files="${*:-$VERSIONS}"
 	local repo="$(echo "$PREFIXES" | cut -d' ' -f1)"
-	for file in $version_files; do
+	for file in $tag_files; do
 		local tag="$(head -1 "$file")"
 		if docker inspect "${repo}:${tag}" >/dev/null 2>&1; then
 			docker run "${repo}:${tag}" apk add --update openssl || exit 1
@@ -65,6 +91,7 @@ main() {
 	cmd="$1"
 	case "$cmd" in
 		test)		shift; test "$@";;
+		commit)	shift; commit "$@";;
 		*)			build "$@";;
 	esac
 }

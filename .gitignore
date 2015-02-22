@@ -1,2 +1,2 @@
-rootfs.tar.xz
-images
+/images
+/**/rootfs.tar.xz
