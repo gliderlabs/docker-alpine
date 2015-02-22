@@ -1,6 +1,9 @@
 general:
   artifacts:
     - "images"
+  branches:
+    ignore:
+      - /rootfs-.*/
 
 machine:
   services:
@@ -15,7 +18,7 @@ dependencies:
     - ./build:
         parallel: true
         files:
-          - versions/*
+          - versions/**/tags
     - mkdir -p ~/docker; docker save alpine-builder > ~/docker/builder.tar
     - docker images
 
@@ -31,4 +34,6 @@ deployment:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASSWORD:
           parallel: true
       - docker push gliderlabs/alpine:
+          parallel: true
+      - ./build commit:
           parallel: true
