@@ -9,6 +9,7 @@ RUN apt-get update \
   && apt-get clean \
   && rm -rf /var/lib/{dpkg,apt,cache,log}
 
-ADD ./mkimage-alpine.sh /mkimage.sh
+COPY scripts/mkimage-alpine.sh /mkimage.sh
+COPY scripts/apk-install /apk-install
 
 ENTRYPOINT ["/mkimage.sh"]

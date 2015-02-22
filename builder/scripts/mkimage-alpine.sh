@@ -14,7 +14,7 @@ set -e
 }
 
 usage() {
-	printf >&2 '%s: [-r release] [-m mirror] [-s] [-e]\n' "$0"
+	printf >&2 '%s: [-r release] [-m mirror] [-s] [-e] [-c]\n' "$0"
 	exit 1
 }
 
@@ -45,6 +45,7 @@ conf() {
 		[ $REL = "edge" ] || printf '%s\n' "@edge $MIRROR/edge/main" >> $ROOTFS/etc/apk/repositories
 		printf '%s\n' "@testing $MIRROR/edge/testing" >> $ROOTFS/etc/apk/repositories
 	}
+	[ $ADD_APK_SCRIPT -eq 1 ] && cp /apk-install $ROOTFS/usr/sbin/apk-install
 	rm -f $ROOTFS/var/cache/apk/*
 }
 
@@ -54,7 +55,7 @@ save() {
 	tar --numeric-owner -C $ROOTFS -c . | xz > rootfs.tar.xz
 }
 
-while getopts "hr:m:se" opt; do
+while getopts "hr:m:sec" opt; do
 	case $opt in
 		r)
 			REL=$OPTARG
@@ -68,6 +69,9 @@ while getopts "hr:m:se" opt; do
 		e)
 			REPO_EXTRA=1
 			;;
+		c)
+			ADD_APK_SCRIPT=1
+			;;
 		*)
 			usage
 			;;
@@ -77,6 +81,7 @@ done
 REL=${REL:-edge}
 MIRROR=${MIRROR:-http://nl.alpinelinux.org/alpine}
 SAVE=${SAVE:-0}
+ADD_APK_SCRIPT=${ADD_APK_SCRIPT:-0}
 REPO=$MIRROR/$REL/main
 REPO_EXTRA=${REPO_EXTRA:-0}
 ARCH=$(uname -m)
