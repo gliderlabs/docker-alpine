@@ -32,6 +32,7 @@ build() {
 		docker run --name "$build" "$BUILD_IMAGE" \
 			-s \
 			-c \
+			-t \
 			-r "$release" \
 			-m "$MIRROR"
 		docker cp "$build":/rootfs.tar.xz "./$version_dir/"
