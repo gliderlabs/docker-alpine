@@ -8,7 +8,7 @@ An example installing the `nginx` package would be `apk add --update nginx`. The
 
 ## Example
 
-Here is a full example `Dockerfile` that intalls the Python runtime and some build dependencies:
+Here is a full example `Dockerfile` that installs the Python runtime and some build dependencies:
 
 ```
 FROM gliderlabs/alpine:3.1
@@ -43,7 +43,7 @@ EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
 ```
 
-## Vitual Packages
+## Virtual Packages
 
 Another great `apk add` feature for cleanup is the concept of virtual packages using the `--virtual` or `-t` switch. Packages added under this virtual name can then be removed as one group. An example use of this would be removing a group of build dependencies all at once:
 
