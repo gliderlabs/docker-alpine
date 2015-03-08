@@ -12,13 +12,18 @@ machine:
 dependencies:
   cache_directories:
     - "~/docker"
+    - "~/deps"
+  pre:
+    - if [[ ! -e ~/deps/bats_v0.4.0.tar.gz ]]; then mkdir -p ~/deps; curl -sSL -o ~/deps/bats_v0.4.0.tar.gz https://github.com/sstephenson/bats/archive/v0.4.0.tar.gz; fi
+    - tar -xf ~/deps/bats_v0.4.0.tar.gz
+    - sudo bats-0.4.0/install.sh /usr/local
   override:
     - docker info
     - if [[ -e ~/docker/builder.tar ]]; then docker load --input ~/docker/builder.tar; fi
     - ./build:
         parallel: true
         files:
-          - versions/**/tags
+          - versions/**/options
     - mkdir -p ~/docker; docker save alpine-builder > ~/docker/builder.tar
     - docker images
 
@@ -26,6 +31,8 @@ test:
   override:
     - ./build test:
         parallel: true
+        files:
+          - versions/**/options
 
 deployment:
   hub:
