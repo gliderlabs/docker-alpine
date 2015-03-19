@@ -16,6 +16,10 @@ Docker images today are big. Usually much larger than they need to be. There are
 
 You use the `apk` command to manage packages. We don't ship the image with a package index (since that can go stale fairly quickly), so you need to add the `--update` flag to `apk` when installing. An example installing the `nginx` package would be `apk add --update nginx`. Check out [the usage page][usage] for more advanced usage and `Dockerfile` examples.
 
+## Caveats
+
+The musl libc implementation may work a little different than you are used to. One example of this is with DNS. musl libc does not use `domain` or `search` in the `/etc/resolv.conf` file. It also queries name servers in parallel which can be problematic if your first name server has a different DNS view (such as service discovery through DNS). We have [a page dedicated to the caveats][caveats] you should be aware of.
+
 ## Build
 
 This image is built and tested in a continuous integration environment using the `build` script. We then push the resulting images directly to Docker Hub. Check out [the page on building and testing][build] the images for more information.
@@ -31,6 +35,7 @@ We welcome contributions to the image build process, version bumps, and other op
 [about]: /docker-alpine/about
 [usage]: /docker-alpine/usage
 [build]: /docker-alpine/build
+[caveats]: /docker-alpine/caveats
 [irc]: https://kiwiirc.com/client/irc.freenode.net/#gliderlabs
 [issues]: https://github.com/gliderlabs/docker-alpine/issues
 [alpine]: http://alpinelinux.org/

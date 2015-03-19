@@ -24,7 +24,7 @@ Unknown package 'nodejs'.
 Collected errors:
 * opkg_install_cmd: Cannot install package nodejs.
 
-$ docker run gliderlabs/alpine apk-install nodejs
+$ docker run gliderlabs/alpine apk --update add nodejs
 fetch http://dl-4.alpinelinux.org/alpine/v3.1/main/x86_64/APKINDEX.tar.gz
 (1/5) Installing c-ares (1.10.0-r1)
 (2/5) Installing libgcc (4.8.3-r0)
@@ -53,7 +53,7 @@ This took 19 seconds to build and yields a 164 MB image. Eww. Start doing this:
 
 ```
 FROM gliderlabs/alpine:3.1
-RUN apk-install mysql-client
+RUN apk --update add mysql-client
 ENTRYPOINT ["mysql"]
 ```
 
