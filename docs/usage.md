@@ -53,8 +53,8 @@ FROM gliderlabs/alpine:3.1
 WORKDIR /myapp
 COPY . /myapp
 
-RUN apk-install python py-pip openssl ca-certificates
-RUN apk-install --virtual build-dependencies python-dev build-base wget \
+RUN apk --update add python py-pip openssl ca-certificates
+RUN apk --update add --virtual build-dependencies python-dev build-base wget \
   && pip install -r requirements.txt \
   && python setup.py install \
   && apk del build-dependencies
