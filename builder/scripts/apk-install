@@ -1,2 +1,3 @@
 #!/bin/sh
+echo "!! apk-install is deprecated. recommended: apk add --update <packages> && rm -rf /var/cache/apk/*"
 apk add --update "$@" && rm -rf /var/cache/apk/*
