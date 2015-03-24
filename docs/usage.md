@@ -30,9 +30,11 @@ EXPOSE 8080
 CMD ["/env/bin/python", "main.py"]
 ```
 
+Notice `rm -rf /var/cache/apk/*` at the end of the `apk add` command. This is good practice to cleanup when you're done using `apk add` to use as little disk space as possible. After all, that's why you're using Alpine here, right?
+
 ## Virtual Packages
 
-Another great `apk add` feature for cleanup is the concept of virtual packages using the `--virtual` or `-t` switch. Packages added under this virtual name can then be removed as one group. An example use of this would be removing a group of build dependencies all at once:
+A great `apk add` feature for cleanup is the concept of virtual packages using the `--virtual` or `-t` switch. Packages added under this virtual name can then be removed as one group. An example use of this would be removing a group of build dependencies all at once:
 
 ```
 FROM gliderlabs/alpine:3.1
