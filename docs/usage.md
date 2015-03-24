@@ -30,19 +30,6 @@ EXPOSE 8080
 CMD ["/env/bin/python", "main.py"]
 ```
 
-## Convenience Cleanup
-
-This image contains a small unofficial wrapper script that assists in the cleanup of the package index after installing packages. A great minimalist cleans up after ones self. Thus, the `apk-install` script was born. Here is another simple `Dockerfile` that installs the `nginx` package and removes package index data:
-
-```
-FROM gliderlabs/alpine:3.1
-
-RUN apk-install nginx
-
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
-```
-
 ## Virtual Packages
 
 Another great `apk add` feature for cleanup is the concept of virtual packages using the `--virtual` or `-t` switch. Packages added under this virtual name can then be removed as one group. An example use of this would be removing a group of build dependencies all at once:
