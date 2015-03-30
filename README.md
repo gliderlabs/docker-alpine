@@ -76,7 +76,7 @@ The motivation for this project and modifications to `mkimage.sh` are highly ins
 The code in this repository, unless otherwise noted, is BSD licensed. See the `LICENSE` file in this repository.
 
 [mini-base]: https://github.com/mini-containers/base
-[alpine-packages]: http://forum.alpinelinux.org/packages
+[alpine-packages]: http://pkgs.alpinelinux.org/packages
 [alpine-about]: https://www.alpinelinux.org/about/
 [docs]: http://gliderlabs.viewdocs.io/docker-alpine
 [irc]: https://kiwiirc.com/client/irc.freenode.net/#gliderlabs
