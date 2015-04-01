@@ -67,4 +67,4 @@ CMD ["myapp", "start"]
 Check out the [Alpine Linux package management documentation][apk] for more information and usage of `apk`.
 
 [apk]: http://wiki.alpinelinux.org/wiki/Alpine_Linux_package_management#Update_the_Package_list
-[packageindex]: http://forum.alpinelinux.org/packages
+[packageindex]: http://pkgs.alpinelinux.org/packages
