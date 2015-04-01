@@ -24,4 +24,4 @@ While there are binaries that will run on musl libc without needing to be recomp
 Error relocating bin/../lib/amd64/jli/libjli.so: __rawmemchr: symbol not found
 ```
 
-In this case, the upstream would need to remove the support for this offending symbol or have the ability to compile the software natively on musl libc. Be sure to check the [Alpine Linux package index](http://forum.alpinelinux.org/packages) to see if a suitable replacement package already exists.
+In this case, the upstream would need to remove the support for this offending symbol or have the ability to compile the software natively on musl libc. Be sure to check the [Alpine Linux package index](http://pkgs.alpinelinux.org/packages) to see if a suitable replacement package already exists.
