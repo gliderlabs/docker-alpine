@@ -5,7 +5,7 @@ setup() {
 @test "version is correct" {
   run docker run gliderlabs/alpine:edge cat /etc/os-release
   [ $status -eq 0 ]
-  [ "${lines[2]}" = "VERSION_ID=3.2.0_rc2" ]
+  [ "${lines[2]}" = "VERSION_ID=3.2.0" ]
 }
 
 @test "package installs cleanly" {
