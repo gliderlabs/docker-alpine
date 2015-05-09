@@ -27,18 +27,23 @@ output_redirect() {
 	fi
 }
 
-get-apk-version() {
-	declare release="$1" mirror="${2:-$MIRROR}"
+get-pkg-version() {
+	declare package="$1" release="$2" mirror="${3:-$MIRROR}"
 	local arch="$(uname -m)"
 	curl -sSL "${mirror}/${release}/main/${arch}/APKINDEX.tar.gz" \
 		| tar -Oxz \
-		| grep '^P:apk-tools-static$' -a -A1 \
+		| grep '^P:'"${package}"'$' -a -A1 \
 		| tail -n1 \
 		| cut -d: -f2
 }
 
+get-apk-version() {
+	declare release="$1" mirror="${2:-$MIRROR}"
+	get-pkg-version "apk-tools-static" "${release}" "${mirror}"
+}
+
 build(){
-	declare mirror="$1" rel="$2" timezone="${3:-UTC}"
+	declare mirror="$1" rel="$2" timezone="${3:-UTC}" packages="${4:-alpine-base}"
 	local repo="$mirror/$rel/main"
 	local arch="$(uname -m)"
 
@@ -59,7 +64,15 @@ build(){
 		--update-cache \
 		--allow-untrusted \
 		--initdb \
-			add alpine-base tzdata | output_redirect
+			add $(echo ${packages}|tr ',' ' ') tzdata | output_redirect
+	"${tmp}/sbin/apk.static" \
+		--root "${rootfs}" \
+		info -e alpine-base > /dev/null || {
+			echo "Extracting alpine-base to store info about release" | output_redirect
+			curl -sSL "${repo}/${arch}/alpine-base-$(get-pkg-version "alpine-base" "${rel}").apk" \
+				| tar -xz -C "${rootfs}" etc/ \
+				| output_redirect
+		}
 	cp -a "${rootfs}/usr/share/zoneinfo/${timezone}" "${rootfs}/etc/localtime"
 	"${tmp}/sbin/apk.static" \
 		--root "$rootfs" \
@@ -85,7 +98,7 @@ build(){
 }
 
 main() {
-	while getopts "hr:m:t:sec" opt; do
+	while getopts "hr:m:t:secp:" opt; do
 		case $opt in
 			r) REL="$OPTARG";;
 			m) MIRROR="$OPTARG";;
@@ -93,11 +106,12 @@ main() {
 			e) REPO_EXTRA=1;;
 			t) TIMEZONE="$OPTARG";;
 			c) ADD_APK_SCRIPT=1;;
+			p) PACKAGES="$OPTARG";;
 			*) usage;;
 		esac
 	done
 
-	build "$MIRROR" "$REL" "$TIMEZONE"
+	build "$MIRROR" "$REL" "$TIMEZONE" "$PACKAGES"
 }
 
 main "$@"
