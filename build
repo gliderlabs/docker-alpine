@@ -62,17 +62,16 @@ commit() {
 
 test() {
 	declare build_files="${*:-$OPTIONS}"
+	declare -a test_files
 	for file in $build_files; do
 		source "$file"
 		local tag
 		tag="$(echo "$TAGS" | cut -d' ' -f1)"
 		tag="${tag//:/-}"
 		tag="${tag//\//_}"
-		bats "test/test_${tag}.bats"
-		# if docker history "${tag}" >/dev/null 2>&1; then
-		# 	tests/util/test "${tag//}"
-		# fi
+		test_files+=("test/test_${tag}.bats")
 	done
+	bats "${test_files[@]}"
 }
 
 main() {
