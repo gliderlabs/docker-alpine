@@ -76,7 +76,7 @@ push() {
 	for file in $build_files; do
 		( source "$file"
 		for tag in $TAGS; do
-			[[ $PUSH_IMAGE ]] && echo docker push $tag
+			[[ $PUSH_IMAGE ]] && docker push $tag
 		done
 		exit 0 )
 	done
