@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-declare BUILD_MASTER="${BUILD_MASTER}"
 declare BUILD_IMAGE="${BUILD_IMAGE:-alpine-builder}"
 declare BUILD_PREFIX="${BUILD_PREFIX:-alpine-build-}"
 declare OPTIONS="${OPTIONS:-versions/**/options}"
@@ -12,7 +11,7 @@ build() {
 	docker build -t "$BUILD_IMAGE" builder
 
 	for file in $build_files; do
-		source "$file"
+		( source "$file"
 		local release="$RELEASE"
 		local build="${BUILD_PREFIX}${release}"
 		local build_options="$BUILD_OPTIONS"
@@ -26,18 +25,16 @@ build() {
 		docker run --rm "$BUILD_IMAGE" $build_options \
 			> "./$version_dir/rootfs.tar.gz" || true
 
-		if [[ "$BUILD_MASTER" ]]; then
-			for tag in $tags; do
-				docker build -t "$tag" "$version_dir"
-				if [[ "$CIRCLE_BUILD_NUM" ]]; then
-					mkdir -p images \
-					&& docker tag -f "$tag" "${tag}-${CIRCLE_BUILD_NUM}" \
-					&& docker save "${tag}-${CIRCLE_BUILD_NUM}" \
-						| gzip -c > "images/${tag//\//_}-${CIRCLE_BUILD_NUM}.tar.gz" \
-					&& docker rmi "${tag}-${CIRCLE_BUILD_NUM}" || true
-				fi
-			done
-		fi
+		for tag in $tags; do
+			docker build -t "$tag" "$version_dir"
+			if [[ "$CIRCLE_BUILD_NUM" ]]; then
+				mkdir -p images \
+				&& docker tag -f "$tag" "${tag}-${CIRCLE_BUILD_NUM}" \
+				&& docker save "${tag}-${CIRCLE_BUILD_NUM}" \
+					| gzip -c > "images/${tag//\//_}-${CIRCLE_BUILD_NUM}.tar.gz" \
+				&& docker rmi "${tag}-${CIRCLE_BUILD_NUM}" || true
+			fi
+		done )
 	done
 }
 
@@ -60,7 +57,7 @@ commit() {
 	done
 }
 
-test() {
+run_tests() {
 	declare build_files="${*:-$OPTIONS}"
 	declare -a test_files
 	for file in $build_files; do
@@ -74,13 +71,25 @@ test() {
 	bats "${test_files[@]}"
 }
 
+push() {
+	declare build_files="${*:-$OPTIONS}"
+	for file in $build_files; do
+		( source "$file"
+		for tag in $TAGS; do
+			[[ $PUSH_IMAGE ]] && echo docker push $tag
+		done
+		exit 0 )
+	done
+}
+
 main() {
 	set -eo pipefail; [[ "$TRACE" ]] && set -x
 	declare cmd="$1"
 	case "$cmd" in
-		test)		shift; test "$@";;
-		commit)	shift; commit "$@";;
-		*)			build "$@";;
+		test)	shift;	run_tests "$@";;
+		commit)	shift;	commit "$@";;
+		push)	shift;	push "$@";;
+		*)		build "$@";;
 	esac
 }
 

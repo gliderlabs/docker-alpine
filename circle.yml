@@ -40,7 +40,9 @@ deployment:
     commands:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASSWORD:
           parallel: true
-      - docker push gliderlabs/alpine:
+      - ./build push:
           parallel: true
+          files:
+            - versions/**/options
       - ./build commit:
           parallel: true
