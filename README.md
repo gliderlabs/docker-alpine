@@ -82,3 +82,4 @@ The code in this repository, unless otherwise noted, is BSD licensed. See the `L
 [irc]: https://kiwiirc.com/client/irc.freenode.net/#gliderlabs
 [issues]: https://github.com/gliderlabs/docker-alpine/issues
 [alpine]: http://alpinelinux.org/
+<img src="https://ga-beacon.appspot.com/UA-58928488-2/docker-alpine/readme?pixel" />
