@@ -74,6 +74,14 @@ build(){
 	}
 
 	[[ "$ADD_APK_SCRIPT" ]] && cp /apk-install "${rootfs}/usr/sbin/apk-install"
+	#Add backup mirrors incase one is down
+	for i in 1 2 3 4 5; do
+		echo "http://dl-${i}.alpinelinux.org/alpine/$rel/main" >> repositories
+		[[ "$REPO_EXTRA" ]] && {
+			[[ "$rel" == "edge" ]] || printf '%s\n' "@edge http://dl-${i}.alpinelinux.org/alpine/edge/main" >> "${rootfs}/etc/apk/repositories"
+			printf '%s\n' "@testing http://dl-${i}.alpinelinux.org/alpine/edge/testing" >> "${rootfs}/etc/apk/repositories"
+		}
+	done
 
 	# save
 	tar -z -f rootfs.tar.gz --numeric-owner -C "$rootfs" -c .
