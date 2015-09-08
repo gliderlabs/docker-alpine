@@ -1,4 +1,5 @@
 export RELEASE="v2.7"
-export BUILD_OPTIONS="-s -c -t UTC -r ${RELEASE} -m http://dl-4.alpinelinux.org/alpine"
+export MIRROR="http://alpine.gliderlabs.com/alpine"
+export BUILD_OPTIONS="-s -c -t UTC -r $RELEASE -m $MIRROR"
 export TAGS="gliderlabs/alpine:2.7"
 export PUSH_IMAGE="true"
