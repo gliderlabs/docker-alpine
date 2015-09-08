@@ -8,6 +8,10 @@ Welcome to the documentation for the Alpine Linux Docker Image. Here we explain 
 
 The heart of this image is [Alpine Linux][alpine]. The image is only 5 MB and has access to a package repository that is much more complete than other minimal base images. Learn more [about this image][about], musl libc, BusyBox, and why the Docker Alpine Linux image makes a great base for your Docker projects.
 
+## Official
+
+This image serves as the source for the [official Alpine Linux image in the Docker Library][library]. The build process for both official `alpine` and `gliderlabs/alpine` are the same. However, different build options are used for the official library images. Check out [the build page][build] for more information on differences.
+
 ## Motivations
 
 Docker images today are big. Usually much larger than they need to be. There are a lot of ways to make them smaller. But you need to start with a small base. There are great size savings to be had when compared to base images such as `ubuntu`, `centos`, and `debian`.
@@ -39,3 +43,4 @@ We welcome contributions to the image build process, version bumps, and other op
 [irc]: https://kiwiirc.com/client/irc.freenode.net/#gliderlabs
 [issues]: https://github.com/gliderlabs/docker-alpine/issues
 [alpine]: http://alpinelinux.org/
+[library]: https://github.com/docker-library/official-images/blob/master/library/alpine
