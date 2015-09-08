@@ -27,7 +27,7 @@ setup() {
 @test "repository list is correct" {
   run docker run "alpine:edge" cat /etc/apk/repositories
   [ $status -eq 0 ]
-  [ "${lines[0]}" = "http://dl-4.alpinelinux.org/alpine/edge/main" ]
+  [ "${lines[0]}" = "http://dl-3.alpinelinux.org/alpine/edge/main" ]
 }
 
 @test "cache is empty" {
