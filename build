@@ -84,6 +84,21 @@ push() {
 	done
 }
 
+library() {
+	local refs="$(git ls-remote --heads origin)"
+	echo "# maintainer: Glider Labs <team@gliderlabs.com> (@gliderlabs)"
+	for file in versions/library-*/options; do
+		source "$file"
+		local version="${RELEASE#v}"
+		echo
+		for tag in $TAGS; do
+			local tag="$(echo "$tag" | cut -d: -f2)"
+			read sha _ <<< $(echo "$refs" | grep rootfs-library-$version)
+			echo "$tag:" "git://github.com/gliderlabs/docker-alpine@$sha" "versions/library-$version"
+		done
+	done
+}
+
 main() {
 	set -eo pipefail; [[ "$TRACE" ]] && set -x
 	declare cmd="$1"
@@ -91,6 +106,7 @@ main() {
 		test)	shift;	run_tests "$@";;
 		commit)	shift;	commit "$@";;
 		push)	shift;	push "$@";;
+		library) shift; library;;
 		*)		build "$@";;
 	esac
 }
