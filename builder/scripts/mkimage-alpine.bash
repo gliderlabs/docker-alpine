@@ -27,16 +27,6 @@ output_redirect() {
 	fi
 }
 
-get-apk-version() {
-	declare release="$1" mirror="${2:-$MIRROR}"
-	local arch="$(uname -m)"
-	curl -sSL "${mirror}/${release}/main/${arch}/APKINDEX.tar.gz" \
-		| tar -Oxz \
-		| grep '^P:apk-tools-static$' -a -A1 \
-		| tail -n1 \
-		| cut -d: -f2
-}
-
 build(){
 	declare mirror="$1" rel="$2" timezone="${3:-UTC}"
 	local repo="$mirror/$rel/main"
@@ -47,33 +37,26 @@ build(){
 	local rootfs="$(mktemp -d "${TMPDIR:-/var/tmp}/alpine-docker-rootfs-XXXXXXXXXX")"
 	# trap "rm -rf $tmp $rootfs" EXIT TERM INT
 
-	# get apk
-	curl -sSL "${repo}/${arch}/apk-tools-static-$(get-apk-version "$rel").apk" \
-		| tar -xz -C "$tmp" sbin/apk.static \
-		| output_redirect
-
 	# mkbase
-	"${tmp}/sbin/apk.static" \
-		--repository "$repo" \
-		--root "$rootfs" \
-		--update-cache \
-		--allow-untrusted \
-		--initdb \
-			add alpine-base tzdata | output_redirect
-	cp -a "${rootfs}/usr/share/zoneinfo/${timezone}" "${rootfs}/etc/localtime"
-	"${tmp}/sbin/apk.static" \
-		--root "$rootfs" \
-			del tzdata | output_redirect
-	rm -f "${rootfs}"/var/cache/apk/* | output_redirect
+	{
+		apk update
+		apk --repository "$repo" fetch --stdout alpine-keys \
+			| tar -xz -C "$tmp" etc/apk/keys
+		apk --root "$rootfs" --repository "$repo" --keys-dir /etc/apk/keys \
+			--update-cache add --initdb alpine-base tzdata
+		rm -f "$rootfs"/var/cache/apk/*
+		cp -a "$rootfs/usr/share/zoneinfo/$timezone" "$rootfs/etc/localtime"
+		apk --root "$rootfs" del tzdata
+	} | output_redirect
 
 	# conf
-	printf '%s\n' "$repo" > "${rootfs}/etc/apk/repositories"
+	printf '%s\n' "$repo" > "$rootfs/etc/apk/repositories"
 	[[ "$REPO_EXTRA" ]] && {
-		[[ "$rel" == "edge" ]] || printf '%s\n' "@edge ${mirror}/edge/main" >> "${rootfs}/etc/apk/repositories"
-		printf '%s\n' "@testing ${mirror}/edge/testing" >> "${rootfs}/etc/apk/repositories"
+		[[ "$rel" == "edge" ]] || printf '%s\n' "@edge $mirror/edge/main" >> "$rootfs/etc/apk/repositories"
+		printf '%s\n' "@testing $mirror/edge/testing" >> "$rootfs/etc/apk/repositories"
 	}
 
-	[[ "$ADD_APK_SCRIPT" ]] && cp /apk-install "${rootfs}/usr/sbin/apk-install"
+	[[ "$ADD_APK_SCRIPT" ]] && cp /apk-install "$rootfs/usr/sbin/apk-install"
 
 	# save
 	tar -z -f rootfs.tar.gz --numeric-owner -C "$rootfs" -c .
