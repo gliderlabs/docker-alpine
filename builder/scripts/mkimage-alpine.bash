@@ -16,7 +16,7 @@ set -eo pipefail; [[ "$TRACE" ]] && set -x
 }
 
 usage() {
-	printf >&2 '%s: [-r release] [-m mirror] [-s] [-e] [-c] [-t timezone] [-p packages]\n' "$0" && exit 1
+	printf >&2 '%s: [-r release] [-m mirror] [-s] [-e] [-c] [-t timezone] [-p packages] [-b]\n' "$0" && exit 1
 }
 
 output_redirect() {
@@ -42,6 +42,9 @@ build() {
 		apk --repository "$repo" --update-cache \
 			fetch --recursive --output "$tmp" \
 			tzdata ${packages//,/ }
+		[[ "$ADD_BASELAYOUT" ]] && \
+			apk --repository "$repo" fetch --stdout alpine-base \
+				| tar -xvz -C "$rootfs" etc
 		apk --root "$rootfs" --allow-untrusted add --initdb "$tmp"/*.apk
 		cp -a "$rootfs/usr/share/zoneinfo/$timezone" "$rootfs/etc/localtime"
 		apk --root "$rootfs" del tzdata
@@ -58,15 +61,13 @@ build() {
 
 	# save
 	tar -z -f rootfs.tar.gz --numeric-owner -C "$rootfs" -c .
-	if [[ "$STDOUT" ]]; then
-		cat rootfs.tar.gz
-	else
-		return 0
-	fi
+	[[ "$STDOUT" ]] && cat rootfs.tar.gz
+
+	return 0
 }
 
 main() {
-	while getopts "hr:m:t:secp:" opt; do
+	while getopts "hr:m:t:secp:b" opt; do
 		case $opt in
 			r) REL="$OPTARG";;
 			m) MIRROR="$OPTARG";;
@@ -75,6 +76,7 @@ main() {
 			t) TIMEZONE="$OPTARG";;
 			c) ADD_APK_SCRIPT=1;;
 			p) PACKAGES="$OPTARG";;
+			b) ADD_BASELAYOUT=1;;
 			*) usage;;
 		esac
 	done
