@@ -39,12 +39,9 @@ build(){
 
 	# mkbase
 	{
-		apk update
-		apk --repository "$repo" fetch --stdout alpine-keys \
-			| tar -xz -C "$tmp" etc/apk/keys
-		apk --root "$rootfs" --repository "$repo" --keys-dir /etc/apk/keys \
-			--update-cache add --initdb alpine-base tzdata
-		rm -f "$rootfs"/var/cache/apk/*
+		apk --repository "$repo" --update-cache \
+			fetch --recursive --output "$tmp" alpine-base tzdata
+		apk --root "$rootfs" --allow-untrusted add --initdb "$tmp"/*.apk
 		cp -a "$rootfs/usr/share/zoneinfo/$timezone" "$rootfs/etc/localtime"
 		apk --root "$rootfs" del tzdata
 	} | output_redirect
