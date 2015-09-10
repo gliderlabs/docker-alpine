@@ -36,26 +36,27 @@ build() {
 	local rootfs="$(mktemp -d "${TMPDIR:-/var/tmp}/alpine-docker-rootfs-XXXXXXXXXX")"
 	# trap "rm -rf $tmp $rootfs" EXIT TERM INT
 
+	# conf
+	{
+		echo "$repo"
+		[[ "$REPO_EXTRA" ]] && {
+			[[ "$rel" == "edge" ]] || echo "@edge $mirror/edge/main"
+			echo "@testing $mirror/edge/testing"
+		}
+	} > /etc/apk/repositories
+
 	# mkbase
 	{
-		apk --repository "$repo" --update-cache \
-			fetch --recursive --output "$tmp" ${packages//,/ }
+		apk --update-cache fetch --recursive --output "$tmp" ${packages//,/ }
 		[[ "$ADD_BASELAYOUT" ]] && \
-			apk --repository "$repo" fetch --stdout alpine-base \
-				| tar -xvz -C "$rootfs" etc
+			apk fetch --stdout alpine-base | tar -xvz -C "$rootfs" etc
 		[[ "$TIMEZONE" ]] && {
-			apk --repository "$repo" add tzdata
+			apk add tzdata
 			install -Dm 644 "/usr/share/zoneinfo/$TIMEZONE" "$rootfs/etc/localtime"
 		}
 		apk --root "$rootfs" --allow-untrusted add --initdb "$tmp"/*.apk
+		install -Dm 644 /etc/apk/repositories "$rootfs/etc/apk/repositories"
 	} | output_redirect
-
-	# conf
-	printf '%s\n' "$repo" > "$rootfs/etc/apk/repositories"
-	[[ "$REPO_EXTRA" ]] && {
-		[[ "$rel" == "edge" ]] || printf '%s\n' "@edge $mirror/edge/main" >> "$rootfs/etc/apk/repositories"
-		printf '%s\n' "@testing $mirror/edge/testing" >> "$rootfs/etc/apk/repositories"
-	}
 
 	[[ "$ADD_APK_SCRIPT" ]] && cp /apk-install "$rootfs/usr/sbin/apk-install"
 
