@@ -13,3 +13,4 @@ The builder takes several options:
 * `-e`: Adds extra `edge/main` and `edge/testing` pins to the repositories file.
 * `-t <timezone>`: Set the timezone. Default is `UTC`.
 * `-p <packages>`: Comma-separated packages list (`tzdata` is always installed). Default is `alpine-base`. 
+* `-b`: Extracts `alpine-base` to the rootfs without dependencies. For images slimmed down with `-p` which still want `/etc/*-release` and `/etc/issue`.
