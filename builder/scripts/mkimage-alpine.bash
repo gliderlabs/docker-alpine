@@ -40,14 +40,13 @@ build() {
 	# mkbase
 	{
 		apk --repository "$repo" --update-cache \
-			fetch --recursive --output "$tmp" \
-			tzdata ${packages//,/ }
+			fetch --recursive --output "$tmp" ${packages//,/ }
 		[[ "$ADD_BASELAYOUT" ]] && \
 			apk --repository "$repo" fetch --stdout alpine-base \
 				| tar -xvz -C "$rootfs" etc
 		apk --root "$rootfs" --allow-untrusted add --initdb "$tmp"/*.apk
-		cp -a "$rootfs/usr/share/zoneinfo/$timezone" "$rootfs/etc/localtime"
-		apk --root "$rootfs" del tzdata
+		apk --repository "$repo" add tzdata
+		cp -a "/usr/share/zoneinfo/$timezone" "$rootfs/etc/localtime"
 	} | output_redirect
 
 	# conf
