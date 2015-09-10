@@ -7,7 +7,6 @@
 
 declare REL="${REL:-edge}"
 declare MIRROR="${MIRROR:-http://nl.alpinelinux.org/alpine}"
-declare TIMEZONE="${TIMEZONE:-UTC}"
 
 set -eo pipefail; [[ "$TRACE" ]] && set -x
 
@@ -28,7 +27,7 @@ output_redirect() {
 }
 
 build() {
-	declare mirror="$1" rel="$2" timezone="${3:-UTC}" packages="${4:-alpine-base}"
+	declare mirror="$1" rel="$2" packages="${3:-alpine-base}"
 	local repo="$mirror/$rel/main"
 	local arch="$(uname -m)"
 
@@ -44,9 +43,11 @@ build() {
 		[[ "$ADD_BASELAYOUT" ]] && \
 			apk --repository "$repo" fetch --stdout alpine-base \
 				| tar -xvz -C "$rootfs" etc
+		[[ "$TIMEZONE" ]] && {
+			apk --repository "$repo" add tzdata
+			install -Dm 644 "/usr/share/zoneinfo/$TIMEZONE" "$rootfs/etc/localtime"
+		}
 		apk --root "$rootfs" --allow-untrusted add --initdb "$tmp"/*.apk
-		apk --repository "$repo" add tzdata
-		cp -a "/usr/share/zoneinfo/$timezone" "$rootfs/etc/localtime"
 	} | output_redirect
 
 	# conf
@@ -80,7 +81,7 @@ main() {
 		esac
 	done
 
-	build "$MIRROR" "$REL" "$TIMEZONE" "$PACKAGES"
+	build "$MIRROR" "$REL" "$PACKAGES"
 }
 
 main "$@"
