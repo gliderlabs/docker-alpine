@@ -16,7 +16,7 @@ set -eo pipefail; [[ "$TRACE" ]] && set -x
 }
 
 usage() {
-	printf >&2 '%s: [-r release] [-m mirror] [-s] [-e] [-c] [-t]\n' "$0" && exit 1
+	printf >&2 '%s: [-r release] [-m mirror] [-s] [-e] [-c] [-t timezone] [-p packages] [-b]\n' "$0" && exit 1
 }
 
 output_redirect() {
@@ -27,8 +27,8 @@ output_redirect() {
 	fi
 }
 
-build(){
-	declare mirror="$1" rel="$2" timezone="${3:-UTC}"
+build() {
+	declare mirror="$1" rel="$2" timezone="${3:-UTC}" packages="${4:-alpine-base}"
 	local repo="$mirror/$rel/main"
 	local arch="$(uname -m)"
 
@@ -40,7 +40,11 @@ build(){
 	# mkbase
 	{
 		apk --repository "$repo" --update-cache \
-			fetch --recursive --output "$tmp" alpine-base tzdata
+			fetch --recursive --output "$tmp" \
+			tzdata ${packages//,/ }
+		[[ "$ADD_BASELAYOUT" ]] && \
+			apk --repository "$repo" fetch --stdout alpine-base \
+				| tar -xvz -C "$rootfs" etc
 		apk --root "$rootfs" --allow-untrusted add --initdb "$tmp"/*.apk
 		cp -a "$rootfs/usr/share/zoneinfo/$timezone" "$rootfs/etc/localtime"
 		apk --root "$rootfs" del tzdata
@@ -57,15 +61,13 @@ build(){
 
 	# save
 	tar -z -f rootfs.tar.gz --numeric-owner -C "$rootfs" -c .
-	if [[ "$STDOUT" ]]; then
-		cat rootfs.tar.gz
-	else
-		return 0
-	fi
+	[[ "$STDOUT" ]] && cat rootfs.tar.gz
+
+	return 0
 }
 
 main() {
-	while getopts "hr:m:t:sec" opt; do
+	while getopts "hr:m:t:secp:b" opt; do
 		case $opt in
 			r) REL="$OPTARG";;
 			m) MIRROR="$OPTARG";;
@@ -73,11 +75,13 @@ main() {
 			e) REPO_EXTRA=1;;
 			t) TIMEZONE="$OPTARG";;
 			c) ADD_APK_SCRIPT=1;;
+			p) PACKAGES="$OPTARG";;
+			b) ADD_BASELAYOUT=1;;
 			*) usage;;
 		esac
 	done
 
-	build "$MIRROR" "$REL" "$TIMEZONE"
+	build "$MIRROR" "$REL" "$TIMEZONE" "$PACKAGES"
 }
 
 main "$@"
