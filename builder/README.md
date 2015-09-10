@@ -12,5 +12,5 @@ The builder takes several options:
 * `-c`: Adds the `apk-install` script to the resulting rootfs.
 * `-e`: Adds extra `edge/main` and `edge/testing` pins to the repositories file.
 * `-t <timezone>`: Set the timezone. Default is `UTC`.
-* `-p <packages>`: Comma-separated packages list (`tzdata` is always installed). Default is `alpine-base`. 
+* `-p <packages>`: Comma-separated packages list (`tzdata` is always installed). Default is `alpine-base`.
 * `-b`: Extracts `alpine-base` to the rootfs without dependencies. For images slimmed down with `-p` which still want `/etc/*-release` and `/etc/issue`.
