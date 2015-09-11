@@ -50,10 +50,8 @@ build() {
 		apk --update-cache fetch --recursive --output "$tmp" ${packages//,/ }
 		[[ "$ADD_BASELAYOUT" ]] && \
 			apk fetch --stdout alpine-base | tar -xvz -C "$rootfs" etc
-		[[ "$TIMEZONE" ]] && {
-			apk add tzdata
-			install -Dm 644 "/usr/share/zoneinfo/$TIMEZONE" "$rootfs/etc/localtime"
-		}
+		[[ "$TIMEZONE" ]] && install -Dm 644 \
+			"/usr/share/zoneinfo/$TIMEZONE" "$rootfs/etc/localtime"
 		apk --root "$rootfs" --allow-untrusted add --initdb "$tmp"/*.apk
 		install -Dm 644 /etc/apk/repositories "$rootfs/etc/apk/repositories"
 	} | output_redirect
