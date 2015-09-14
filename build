@@ -22,8 +22,8 @@ build() {
 
 		docker rm "$build" 2>/dev/null || true
 
-		docker run --rm "$BUILD_IMAGE" $build_options \
-			> "./$version_dir/rootfs.tar.gz" || true
+		docker run --name "${build}" "$BUILD_IMAGE" $build_options \
+			> "./$version_dir/rootfs.tar.gz"
 
 		for tag in $tags; do
 			docker build -t "$tag" "$version_dir"
@@ -34,7 +34,8 @@ build() {
 					| gzip -c > "images/${tag//\//_}-${CIRCLE_BUILD_NUM}.tar.gz" \
 				&& docker rmi "${tag}-${CIRCLE_BUILD_NUM}" || true
 			fi
-		done )
+		done
+		docker rm "$build" 2>/dev/null || true )
 	done
 }
 
