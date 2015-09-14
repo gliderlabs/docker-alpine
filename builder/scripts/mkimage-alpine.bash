@@ -27,9 +27,14 @@ output_redirect() {
 	fi
 }
 
+get-arch() {
+	local hwname="$(uname -m)"
+	echo "${hwname/#arm*/armhf}"
+}
+
 get-apk-version() {
 	declare release="$1" mirror="${2:-$MIRROR}"
-	local arch="$(uname -m)"
+	local arch="$(get-arch)"
 	curl -sSL "${mirror}/${release}/main/${arch}/APKINDEX.tar.gz" \
 		| tar -Oxz \
 		| grep '^P:apk-tools-static$' -a -A1 \
@@ -40,7 +45,7 @@ get-apk-version() {
 build(){
 	declare mirror="$1" rel="$2" timezone="${3:-UTC}"
 	local repo="$mirror/$rel/main"
-	local arch="$(uname -m)"
+	local arch="$(get-arch)"
 
 	# tmp
 	local tmp="$(mktemp -d "${TMPDIR:-/var/tmp}/alpine-docker-XXXXXXXXXX")"
