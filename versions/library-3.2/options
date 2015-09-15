@@ -1,4 +1,5 @@
 export RELEASE="v3.2"
 export MIRROR="http://dl-4.alpinelinux.org/alpine"
-export BUILD_OPTIONS="-s -t UTC -r $RELEASE -m $MIRROR"
+export PACKAGES="alpine-baselayout,apk-tools,busybox,libc-utils,alpine-keys"
+export BUILD_OPTIONS="-s -t UTC -r ${RELEASE} -m ${MIRROR} -p ${PACKAGES}"
 export TAGS="alpine:3.2 alpine:latest"
