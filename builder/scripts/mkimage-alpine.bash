@@ -7,7 +7,6 @@
 
 declare REL="${REL:-edge}"
 declare MIRROR="${MIRROR:-http://nl.alpinelinux.org/alpine}"
-declare TIMEZONE="${TIMEZONE:-UTC}"
 
 set -eo pipefail; [[ "$TRACE" ]] && set -x
 
@@ -16,7 +15,7 @@ set -eo pipefail; [[ "$TRACE" ]] && set -x
 }
 
 usage() {
-	printf >&2 '%s: [-r release] [-m mirror] [-s] [-e] [-c] [-t]\n' "$0" && exit 1
+	printf >&2 '%s: [-r release] [-m mirror] [-s] [-e] [-c] [-t timezone] [-p packages] [-b]\n' "$0" && exit 1
 }
 
 output_redirect() {
@@ -27,18 +26,8 @@ output_redirect() {
 	fi
 }
 
-get-apk-version() {
-	declare release="$1" mirror="${2:-$MIRROR}"
-	local arch="$(uname -m)"
-	curl -sSL "${mirror}/${release}/main/${arch}/APKINDEX.tar.gz" \
-		| tar -Oxz \
-		| grep '^P:apk-tools-static$' -a -A1 \
-		| tail -n1 \
-		| cut -d: -f2
-}
-
-build(){
-	declare mirror="$1" rel="$2" timezone="${3:-UTC}"
+build() {
+	declare mirror="$1" rel="$2" packages="${3:-alpine-base}"
 	local repo="$mirror/$rel/main"
 	local arch="$(uname -m)"
 
@@ -47,45 +36,37 @@ build(){
 	local rootfs="$(mktemp -d "${TMPDIR:-/var/tmp}/alpine-docker-rootfs-XXXXXXXXXX")"
 	# trap "rm -rf $tmp $rootfs" EXIT TERM INT
 
-	# get apk
-	curl -sSL "${repo}/${arch}/apk-tools-static-$(get-apk-version "$rel").apk" \
-		| tar -xz -C "$tmp" sbin/apk.static \
-		| output_redirect
+	# conf
+	{
+		echo "$repo"
+		[[ "$REPO_EXTRA" ]] && {
+			[[ "$rel" == "edge" ]] || echo "@edge $mirror/edge/main"
+			echo "@testing $mirror/edge/testing"
+		}
+	} > /etc/apk/repositories
 
 	# mkbase
-	"${tmp}/sbin/apk.static" \
-		--repository "$repo" \
-		--root "$rootfs" \
-		--update-cache \
-		--allow-untrusted \
-		--initdb \
-			add alpine-base tzdata | output_redirect
-	cp -a "${rootfs}/usr/share/zoneinfo/${timezone}" "${rootfs}/etc/localtime"
-	"${tmp}/sbin/apk.static" \
-		--root "$rootfs" \
-			del tzdata | output_redirect
-	rm -f "${rootfs}"/var/cache/apk/* | output_redirect
+	{
+		apk --update-cache fetch --recursive --output "$tmp" ${packages//,/ }
+		[[ "$ADD_BASELAYOUT" ]] && \
+			apk fetch --stdout alpine-base | tar -xvz -C "$rootfs" etc
+		[[ "$TIMEZONE" ]] && install -Dm 644 \
+			"/usr/share/zoneinfo/$TIMEZONE" "$rootfs/etc/localtime"
+		apk --root "$rootfs" --allow-untrusted add --initdb "$tmp"/*.apk
+		install -Dm 644 /etc/apk/repositories "$rootfs/etc/apk/repositories"
+	} | output_redirect
 
-	# conf
-	printf '%s\n' "$repo" > "${rootfs}/etc/apk/repositories"
-	[[ "$REPO_EXTRA" ]] && {
-		[[ "$rel" == "edge" ]] || printf '%s\n' "@edge ${mirror}/edge/main" >> "${rootfs}/etc/apk/repositories"
-		printf '%s\n' "@testing ${mirror}/edge/testing" >> "${rootfs}/etc/apk/repositories"
-	}
-
-	[[ "$ADD_APK_SCRIPT" ]] && cp /apk-install "${rootfs}/usr/sbin/apk-install"
+	[[ "$ADD_APK_SCRIPT" ]] && cp /apk-install "$rootfs/usr/sbin/apk-install"
 
 	# save
 	tar -z -f rootfs.tar.gz --numeric-owner -C "$rootfs" -c .
-	if [[ "$STDOUT" ]]; then
-		cat rootfs.tar.gz
-	else
-		return 0
-	fi
+	[[ "$STDOUT" ]] && cat rootfs.tar.gz
+
+	return 0
 }
 
 main() {
-	while getopts "hr:m:t:sec" opt; do
+	while getopts "hr:m:t:secp:b" opt; do
 		case $opt in
 			r) REL="$OPTARG";;
 			m) MIRROR="$OPTARG";;
@@ -93,11 +74,13 @@ main() {
 			e) REPO_EXTRA=1;;
 			t) TIMEZONE="$OPTARG";;
 			c) ADD_APK_SCRIPT=1;;
+			p) PACKAGES="$OPTARG";;
+			b) ADD_BASELAYOUT=1;;
 			*) usage;;
 		esac
 	done
 
-	build "$MIRROR" "$REL" "$TIMEZONE"
+	build "$MIRROR" "$REL" "$PACKAGES"
 }
 
 main "$@"
