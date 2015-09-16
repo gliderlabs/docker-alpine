@@ -27,7 +27,7 @@ setup() {
 @test "repository list is correct" {
   run docker run gliderlabs/alpine:3.1 cat /etc/apk/repositories
   [ $status -eq 0 ]
-  [ "${lines[0]}" = "http://dl-4.alpinelinux.org/alpine/v3.1/main" ]
+  [ "${lines[0]}" = "http://alpine.gliderlabs.com/alpine/v3.1/main" ]
 }
 
 @test "cache is empty" {

@@ -36,6 +36,12 @@ We make reasonable efforts to support our work and are always happy to chat. Fee
 
 We welcome contributions to the image build process, version bumps, and other optimizations. The image gets built and pushed from the `release` branch automatically. Once a pull request is merged, a build will be kicked off, and resulting image pushed to Docker Hub in a matter of minutes!
 
+## Sponsors
+
+[![Fastly](https://github.com/gliderlabs/docker-alpine/raw/master/logo_fastly.png)][fastly]
+
+[Fastly][fastly] provides the CDN for our Alpine Linux package repository. This is allows super speedy package downloads from all over the globe! Check out
+
 [about]: /docker-alpine/about
 [usage]: /docker-alpine/usage
 [build]: /docker-alpine/build
@@ -44,3 +50,4 @@ We welcome contributions to the image build process, version bumps, and other op
 [issues]: https://github.com/gliderlabs/docker-alpine/issues
 [alpine]: http://alpinelinux.org/
 [library]: https://github.com/docker-library/official-images/blob/master/library/alpine
+[fastly]: https://www.fastly.com/

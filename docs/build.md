@@ -14,11 +14,14 @@ The image is built using a builder Docker container based on the `debian` image.
 
 The build script takes a glob of `options` files as an argument. Each of these files lives in a folder that describes the version of Alpine Linux to build. Each line of the `options` file are the options that will be applied to the resulting image. By default, we use the included glob of `versions/**/options`.
 
-### Official
+## Differences
 
 As we maintain the [official Alpine Linux image in the Docker Library][library], we have specific `options` files for library versions. These contain options that may differ slightly from the `gliderlabs/alpine` image. Compare the `BUILD_OPTIONS` variable to see differences between versions.
 
-In the future, Glider Labs may add features that are not available in upstream Alpine Linux (such as a package repository or scripts to install packages from GitHub). These options would not make it to the official Docker library since they are not available upstream.
+The `gliderlabs/alpine` has these additional features:
+
+* Alpine package mirror CDN sponsored by [Fastly][fastly] for speedy package installation all over the globe.
+* An `apk-install` convenience script to update the index, add packages, and then remove the cache.
 
 This should help with your image decision. If features of the `gliderlabs/alpine` image are not of importance to you and you value closest to upstream, then stick with `alpine`. If you want to use additional features we add to the image, then you would use `gliderlabs/alpine`.
 
@@ -29,3 +32,4 @@ The test for images is very simple at the moment. It just attempts to install th
 Use the `test` sub-command of the `build` utility to run tests on currently build images (`build test`).
 
 [library]: https://github.com/docker-library/official-images/blob/master/library/alpine
+[fastly]: https://www.fastly.com/

@@ -71,6 +71,12 @@ We make reasonable efforts to support our work and are always happy to chat. Fee
 
 The motivation for this project and modifications to `mkimage.sh` are highly inspired by Eivind Uggedal (uggedal) and Luis Lavena (luislavena). They have made great strides in getting Alpine Linux running as a Docker container. Check out their [mini-container/base][mini-base] image as well.
 
+## Sponsors
+
+[![Fastly](https://github.com/gliderlabs/docker-alpine/raw/master/logo_fastly.png)][fastly]
+
+[Fastly][fastly] provides the CDN for our Alpine Linux package repository. This is allows super speedy package downloads from all over the globe!
+
 ## License
 
 The code in this repository, unless otherwise noted, is BSD licensed. See the `LICENSE` file in this repository.
@@ -82,4 +88,5 @@ The code in this repository, unless otherwise noted, is BSD licensed. See the `L
 [irc]: https://kiwiirc.com/client/irc.freenode.net/#gliderlabs
 [issues]: https://github.com/gliderlabs/docker-alpine/issues
 [alpine]: http://alpinelinux.org/
+[fastly]: https://www.fastly.com/
 <img src="https://ga-beacon.appspot.com/UA-58928488-2/docker-alpine/readme?pixel" />
