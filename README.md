@@ -1,6 +1,9 @@
 # docker-alpine
 
-[![CircleCI](https://img.shields.io/circleci/project/gliderlabs/docker-alpine/release.svg)](https://circleci.com/gh/gliderlabs/docker-alpine) [![Docker Hub](https://img.shields.io/badge/docker-ready-blue.svg)](https://registry.hub.docker.com/u/gliderlabs/alpine/) [![IRC Channel](https://img.shields.io/badge/irc-%23gliderlabs-blue.svg)][irc]
+[![CircleCI](https://img.shields.io/circleci/project/gliderlabs/docker-alpine/release.svg)](https://circleci.com/gh/gliderlabs/docker-alpine)
+[![Docker Stars](https://img.shields.io/docker/stars/gliderlabs/alpine.svg)][hub]
+[![Docker Pulls](https://img.shields.io/docker/pulls/gliderlabs/alpine.svg)][hub]
+[![IRC Channel](https://img.shields.io/badge/irc-%23gliderlabs-blue.svg)][irc]
 
 A super small Docker image based on [Alpine Linux][alpine]. The image is only 5 MB and has access to a package repository that is much more complete than other BusyBox based images.
 
@@ -89,4 +92,5 @@ The code in this repository, unless otherwise noted, is BSD licensed. See the `L
 [issues]: https://github.com/gliderlabs/docker-alpine/issues
 [alpine]: http://alpinelinux.org/
 [fastly]: https://www.fastly.com/
+[hub]: https://hub.docker.com/r/gliderlabs/alpine/
 <img src="https://ga-beacon.appspot.com/UA-58928488-2/docker-alpine/readme?pixel" />

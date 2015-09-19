@@ -1,6 +1,9 @@
 # Alpine Linux Docker Image
 
-[![CircleCI](https://img.shields.io/circleci/project/gliderlabs/docker-alpine/release.svg)](https://circleci.com/gh/gliderlabs/docker-alpine) [![Docker Hub](https://img.shields.io/badge/docker-ready-blue.svg)](https://registry.hub.docker.com/u/gliderlabs/alpine/) [![IRC Channel](https://img.shields.io/badge/irc-%23gliderlabs-blue.svg)][irc]
+[![CircleCI](https://img.shields.io/circleci/project/gliderlabs/docker-alpine/release.svg)](https://circleci.com/gh/gliderlabs/docker-alpine)
+[![Docker Stars](https://img.shields.io/docker/stars/gliderlabs/alpine.svg)][hub]
+[![Docker Pulls](https://img.shields.io/docker/pulls/gliderlabs/alpine.svg)][hub]
+[![IRC Channel](https://img.shields.io/badge/irc-%23gliderlabs-blue.svg)][irc]
 
 Welcome to the documentation for the Alpine Linux Docker Image. Here we explain a bit about the motivations behind this image, how you typically use it, the build process, and how to make great minimalist containers!
 
@@ -51,3 +54,4 @@ We welcome contributions to the image build process, version bumps, and other op
 [alpine]: http://alpinelinux.org/
 [library]: https://github.com/docker-library/official-images/blob/master/library/alpine
 [fastly]: https://www.fastly.com/
+[hub]: https://hub.docker.com/r/gliderlabs/alpine/
