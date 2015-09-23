@@ -44,7 +44,7 @@ This makes Alpine Linux a great image base for utilities and even production app
 
 Stop doing this:
 
-```
+```dockerfile
 FROM ubuntu-debootstrap:14.04
 RUN apt-get update -q \
   && DEBIAN_FRONTEND=noninteractive apt-get install -qy mysql-client \
@@ -54,7 +54,7 @@ ENTRYPOINT ["mysql"]
 ```
 This took 19 seconds to build and yields a 164 MB image. Eww. Start doing this:
 
-```
+```dockerfile
 FROM gliderlabs/alpine:3.1
 RUN apk --update add mysql-client
 ENTRYPOINT ["mysql"]
