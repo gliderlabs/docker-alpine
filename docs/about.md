@@ -1,6 +1,6 @@
 # About
 
-[Alpine Linux][http://alpinelinux.org/] is a lightweight Linux distribution based on [musl libc][musl] and [BusyBox][busybox]. The base is extremely small, builds as a Docker image in a matter of minutes, and has a full-featured package index.
+[Alpine Linux](http://alpinelinux.org/) is a lightweight Linux distribution based on [musl libc][musl] and [BusyBox][busybox]. The base is extremely small, builds as a Docker image in a matter of minutes, and has a full-featured package index.
 
 ## musl libc
 
