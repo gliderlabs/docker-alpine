@@ -21,7 +21,6 @@ usage() {
 build() {
 	declare mirror="$1" rel="$2" packages="${3:-alpine-base}"
 	local repo="$mirror/$rel/main"
-	local arch="$(uname -m)"
 
 	# tmp
 	local tmp="$(mktemp -d "${TMPDIR:-/var/tmp}/alpine-docker-XXXXXXXXXX")"
@@ -61,7 +60,7 @@ main() {
 	while getopts "hr:m:t:secp:b" opt; do
 		case $opt in
 			r) REL="$OPTARG";;
-			m) MIRROR="$OPTARG";;
+			m) MIRROR="${OPTARG%/}";;
 			s) STDOUT=1;;
 			e) REPO_EXTRA=1;;
 			t) TIMEZONE="$OPTARG";;
