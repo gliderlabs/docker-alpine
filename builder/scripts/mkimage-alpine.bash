@@ -18,14 +18,6 @@ usage() {
 	printf >&2 '%s: [-r release] [-m mirror] [-s] [-e] [-c] [-t timezone] [-p packages] [-b]\n' "$0" && exit 1
 }
 
-output_redirect() {
-	if [[ "$STDOUT" ]]; then
-		cat - 1>&2
-	else
-		cat -
-	fi
-}
-
 build() {
 	declare mirror="$1" rel="$2" packages="${3:-alpine-base}"
 	local repo="$mirror/$rel/main"
@@ -54,7 +46,7 @@ build() {
 			"/usr/share/zoneinfo/$TIMEZONE" "$rootfs/etc/localtime"
 		apk --root "$rootfs" --allow-untrusted add --initdb "$tmp"/*.apk
 		install -Dm 644 /etc/apk/repositories "$rootfs/etc/apk/repositories"
-	} | output_redirect
+	} >&2
 
 	[[ "$ADD_APK_SCRIPT" ]] && cp /apk-install "$rootfs/usr/sbin/apk-install"
 
