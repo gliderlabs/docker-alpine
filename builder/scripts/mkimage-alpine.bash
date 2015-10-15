@@ -28,8 +28,8 @@ build() {
 
 	# conf
 	{
-    echo "$mirror/$rel/main"
-    [[ "$OMIT_COMMUNITY" ]] || echo "$mirror/$rel/community"
+		echo "$mirror/$rel/main"
+		[[ "$OMIT_COMMUNITY" ]] || echo "$mirror/$rel/community"
 		[[ "$REPO_EXTRA" ]] && {
 			[[ "$rel" == "edge" ]] || echo "@edge $mirror/edge/main"
 			echo "@testing $mirror/edge/testing"
