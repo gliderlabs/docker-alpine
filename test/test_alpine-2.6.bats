@@ -28,6 +28,7 @@ setup() {
   run docker run alpine:2.6 cat /etc/apk/repositories
   [ $status -eq 0 ]
   [ "${lines[0]}" = "http://dl-4.alpinelinux.org/alpine/v2.6/main" ]
+  [ "${lines[1]}" = "" ]
 }
 
 @test "cache is empty" {

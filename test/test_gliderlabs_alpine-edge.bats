@@ -28,6 +28,8 @@ setup() {
   run docker run gliderlabs/alpine:edge cat /etc/apk/repositories
   [ $status -eq 0 ]
   [ "${lines[0]}" = "http://alpine.gliderlabs.com/alpine/edge/main" ]
+  [ "${lines[1]}" = "http://alpine.gliderlabs.com/alpine/edge/community" ]
+  [ "${lines[2]}" = "" ]
 }
 
 @test "cache is empty" {

@@ -28,6 +28,8 @@ setup() {
   run docker run "alpine:edge" cat /etc/apk/repositories
   [ $status -eq 0 ]
   [ "${lines[0]}" = "http://dl-4.alpinelinux.org/alpine/edge/main" ]
+  [ "${lines[1]}" = "http://dl-4.alpinelinux.org/alpine/edge/community" ]
+  [ "${lines[2]}" = "" ]
 }
 
 @test "cache is empty" {
