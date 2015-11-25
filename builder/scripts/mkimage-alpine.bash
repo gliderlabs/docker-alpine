@@ -43,6 +43,7 @@ build() {
 			apk fetch --stdout alpine-base | tar -xvz -C "$rootfs" etc
 		[[ "$TIMEZONE" ]] && \
 			cp "/usr/share/zoneinfo/$TIMEZONE" "$rootfs/etc/localtime"
+		sed -ie 's/^root::/root:!:/' "$rootfs/etc/shadow"
 	} >&2
 
 	[[ "$ADD_APK_SCRIPT" ]] && cp /apk-install "$rootfs/usr/sbin/apk-install"
