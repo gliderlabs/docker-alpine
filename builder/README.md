@@ -11,6 +11,7 @@ The builder takes several options:
 * `-s`: Outputs the `rootfs.tar.gz` to stdout.
 * `-c`: Adds the `apk-install` script to the resulting rootfs.
 * `-e`: Adds extra `edge/main` and `edge/testing` pins to the repositories file.
+* `-d`: Disables su to root by removing the blank root password.
 * `-E`: Does not add `community` to the repositories file (necessary for versions without a community repo).
 * `-t <timezone>`: Sets the timezone.
 * `-p <packages>`: Comma-separated packages list. Default is `alpine-base`.
