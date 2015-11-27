@@ -1,3 +1,3 @@
 export RELEASE="v2.7"
-export BUILD_OPTIONS="-s -E -t UTC -r ${RELEASE} -m http://dl-4.alpinelinux.org/alpine"
+export BUILD_OPTIONS="-d -s -E -t UTC -r ${RELEASE} -m http://dl-4.alpinelinux.org/alpine"
 export TAGS="alpine:2.7"

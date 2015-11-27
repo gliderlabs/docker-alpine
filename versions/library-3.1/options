@@ -1,4 +1,4 @@
 export RELEASE="v3.1"
 export MIRROR="http://dl-4.alpinelinux.org/alpine"
-export BUILD_OPTIONS="-s -E -t UTC -r $RELEASE -m $MIRROR"
+export BUILD_OPTIONS="-d -s -E -t UTC -r $RELEASE -m $MIRROR"
 export TAGS="alpine:3.1"

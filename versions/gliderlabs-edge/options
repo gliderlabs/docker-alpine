@@ -1,5 +1,5 @@
 export RELEASE="edge"
 export MIRROR="http://alpine.gliderlabs.com/alpine"
-export BUILD_OPTIONS="-s -c -t UTC -r $RELEASE -m $MIRROR"
+export BUILD_OPTIONS="-d -s -c -t UTC -r $RELEASE -m $MIRROR"
 export TAGS="gliderlabs/alpine:edge"
 export PUSH_IMAGE="true"
