@@ -21,7 +21,8 @@ usage() {
 build() {
 	declare mirror="$1" rel="$2" packages="${3:-alpine-base}"
 
-	local rootfs="$(mktemp -d "${TMPDIR:-/var/tmp}/alpine-docker-rootfs-XXXXXXXXXX")"
+	local rootfs
+	rootfs="$(mktemp -d "${TMPDIR:-/var/tmp}/alpine-docker-rootfs-XXXXXXXXXX")"
 
 	# conf
 	mkdir -p "$rootfs/etc/apk"
@@ -37,10 +38,10 @@ build() {
 	# mkbase
 	{
 		apk --root "$rootfs" --update-cache --keys-dir /etc/apk/keys \
-			add --initdb ${packages//,/ }
-		rm -f "$rootfs/var/cache/apk"/*
+			add --initdb "${packages//,/ }"
 		[[ "$ADD_BASELAYOUT" ]] && \
-			apk fetch --stdout alpine-base | tar -xvz -C "$rootfs" etc
+			apk --root "$rootfs" --keys-dir /etc/apk/keys fetch --stdout alpine-base | tar -xvz -C "$rootfs" etc
+		rm -f "$rootfs/var/cache/apk"/*
 		[[ "$TIMEZONE" ]] && \
 			cp "/usr/share/zoneinfo/$TIMEZONE" "$rootfs/etc/localtime"
 	} >&2
