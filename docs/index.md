@@ -36,7 +36,7 @@ This image is built and tested in a continuous integration environment using the
 
 ## Support
 
-We make reasonable efforts to support our work and are always happy to chat. Feel free to join us in [#gliderlabs on Freenode][irc] or [submit an issue][issues] to the GitHub repository.
+We make reasonable efforts to support our work and are always happy to chat. Feel free to join us in [our Slack community][slack] or [submit an issue][issues] to the GitHub repository.
 
 ## Contributing
 

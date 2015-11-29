@@ -71,7 +71,7 @@ This image is well documented. [Check out the documentation at Viewdocs][docs] a
 
 ## Support
 
-We make reasonable efforts to support our work and are always happy to chat. Feel free to join us in [#gliderlabs on Freenode][irc] or [submit an issue][issues] to this GitHub repository.
+We make reasonable efforts to support our work and are always happy to chat. Feel free to join us in [our Slack community][slack] or [submit an issue][issues] to this GitHub repository.
 
 ## Inspiration
 
