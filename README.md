@@ -3,7 +3,7 @@
 [![CircleCI](https://img.shields.io/circleci/project/gliderlabs/docker-alpine/release.svg)](https://circleci.com/gh/gliderlabs/docker-alpine)
 [![Docker Stars](https://img.shields.io/docker/stars/gliderlabs/alpine.svg)][hub]
 [![Docker Pulls](https://img.shields.io/docker/pulls/gliderlabs/alpine.svg)][hub]
-[![IRC Channel](https://img.shields.io/badge/irc-%23gliderlabs-blue.svg)][irc]
+[![Slack](http://glider-slackin.herokuapp.com/badge.svg)][slack]
 [![Image Size](https://img.shields.io/imagelayers/image-size/gliderlabs/alpine/latest.svg)](https://imagelayers.io/?images=gliderlabs/alpine:latest)
 [![Image Layers](https://img.shields.io/imagelayers/layers/gliderlabs/alpine/latest.svg)](https://imagelayers.io/?images=gliderlabs/alpine:latest)
 
@@ -91,7 +91,7 @@ The code in this repository, unless otherwise noted, is BSD licensed. See the `L
 [alpine-packages]: http://pkgs.alpinelinux.org/
 [alpine-about]: https://www.alpinelinux.org/about/
 [docs]: http://gliderlabs.viewdocs.io/docker-alpine
-[irc]: https://kiwiirc.com/client/irc.freenode.net/#gliderlabs
+[slack]: http://glider-slackin.herokuapp.com/
 [issues]: https://github.com/gliderlabs/docker-alpine/issues
 [alpine]: http://alpinelinux.org/
 [fastly]: https://www.fastly.com/
