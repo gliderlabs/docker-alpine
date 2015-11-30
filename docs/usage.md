@@ -32,7 +32,7 @@ CMD ["/env/bin/python", "main.py"]
 
 ## Convenience Cleanup
 
-This image contains a small unofficial wrapper script that assists in the cleanup of the package index after installing packages. A great minimalist cleans up after ones self. Thus, the `apk-install` script was born. Here is another simple `Dockerfile` that installs the `nginx` package and removes package index data:
+The `gliderlabs` variant of this image contains a small unofficial wrapper script that assists in the cleanup of the package index after installing packages. A great minimalist cleans up after ones self. Thus, the `apk-install` script was born. Here is another simple `Dockerfile` that installs the `nginx` package and removes package index data:
 
 ```
 FROM gliderlabs/alpine:3.1
@@ -42,6 +42,8 @@ RUN apk-install nginx
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
 ```
+
+This convenience script is not available in the official Docker Library Alpine Linux image. See [the build page](/docker-alpine/build) for more information on the differences between the two variants.
 
 ## Virtual Packages
 
