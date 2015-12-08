@@ -12,7 +12,7 @@ A super small Docker image based on [Alpine Linux][alpine]. The image is only 5 
 
 ## Why?
 
-Docker images today are big. Usually much larger than they need to be. There are a lot of ways to make them smaller. But the Docker populous still jumps to the `ubuntu` base image for most projects. The size savings over `ubuntu` and other bases are huge:
+Docker images today are big. Usually much larger than they need to be. There are a lot of ways to make them smaller, but the Docker populace still jumps to the `ubuntu` base image for most projects. The size savings over `ubuntu` and other bases are huge:
 
 ```
 REPOSITORY          TAG           IMAGE ID          VIRTUAL SIZE
