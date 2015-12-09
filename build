@@ -44,9 +44,10 @@ commit() {
 	local build_num="${CIRCLE_BUILD_NUM:-nobuild}"
 
 	for file in $rootfs_files; do
-		local release="$(basename "$(dirname "$file")")"
-		local version_dir="$(dirname "$file")"
-		local current_branch=$(git rev-parse --abbrev-ref HEAD)
+		local release version_dir current_branch
+		release="$(basename "$(dirname "$file")")"
+		version_dir="$(dirname "$file")"
+		current_branch=$(git rev-parse --abbrev-ref HEAD)
 
 		: "${release:?}"
 
