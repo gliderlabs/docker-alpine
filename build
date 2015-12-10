@@ -42,14 +42,15 @@ build() {
 commit() {
 	declare rootfs_files="${*:-versions/**/rootfs.tar.gz}"
 	local build_num="${CIRCLE_BUILD_NUM:-nobuild}"
+	local current_branch
+	current_branch=$(git rev-parse --abbrev-ref HEAD)
 
 	for file in $rootfs_files; do
-		local release version_dir current_branch
+		local release version_dir
 		release="$(basename "$(dirname "$file")")"
 		version_dir="$(dirname "$file")"
-		current_branch=$(git rev-parse --abbrev-ref HEAD)
 
-		: "${release:?}"
+		: "${release:?}" "${current_branch:?}"
 
 		git checkout -B "rootfs-$release"
 		git add -f -- "$file"
