@@ -69,9 +69,9 @@ Only 3 seconds to build and results in a 16 MB image! Hooray!
 
 This image is well documented. [Check out the documentation at Viewdocs][docs] and the `docs` directory in this repository.
 
-## Support
+## Contacts
 
-We make reasonable efforts to support our work and are always happy to chat. Feel free to join us in [our Slack community][slack] or [submit an issue][issues] to this GitHub repository.
+We make reasonable efforts to support our work and are always happy to chat. Join us in [our Slack community][slack] or [submit a GitHub issue][issues] if you have a security or other general question about this Docker image. Please email [security](http://lists.alpinelinux.org/alpine-security/summary.html) or [user](http://lists.alpinelinux.org/alpine-user/summary.html) mailing lists if you have concerns specific to Alpine Linux.
 
 ## Inspiration
 

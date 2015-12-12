@@ -34,9 +34,9 @@ The musl libc implementation may work a little different than you are used to. O
 
 This image is built and tested in a continuous integration environment using the `build` script. We then push the resulting images directly to Docker Hub. Check out [the page on building and testing][build] the images for more information.
 
-## Support
+## Contacts
 
-We make reasonable efforts to support our work and are always happy to chat. Feel free to join us in [our Slack community][slack] or [submit an issue][issues] to the GitHub repository.
+We make reasonable efforts to support our work and are always happy to chat. Join us in [our Slack community][slack] or [submit a GitHub issue][issues] if you have a security or other general question about this Docker image. Please email [security](http://lists.alpinelinux.org/alpine-security/summary.html) or [user](http://lists.alpinelinux.org/alpine-user/summary.html) mailing lists if you have concerns specific to Alpine Linux.
 
 ## Contributing
 
