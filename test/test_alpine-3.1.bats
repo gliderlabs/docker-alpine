@@ -36,3 +36,9 @@ setup() {
   [ $status -eq 0 ]
   [ "$output" = "0" ]
 }
+
+@test "root password is disabled" {
+  run docker run "alpine:3.1" sh -c "adduser -D -s /bin/ash test; su -c 'echo | su' - test"
+  [ $status -eq 1 ]
+  [ "${lines[1]}" = "su: incorrect password" ]
+}
