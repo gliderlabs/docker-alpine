@@ -39,7 +39,6 @@ setup() {
 }
 
 @test "root password is disabled" {
-  run docker run "alpine:edge" sh -c "adduser -D -s /bin/ash test; su -c 'echo | su' - test"
+  run docker run --user nobody "alpine:edge" su
   [ $status -eq 1 ]
-  [ "${lines[1]}" = "su: incorrect password" ]
 }

@@ -38,7 +38,6 @@ setup() {
 }
 
 @test "root password is disabled" {
-  run docker run gliderlabs/alpine:3.2 sh -c "adduser -D -s /bin/ash test; su -c 'echo | su' - test"
+  run docker run --user nobody gliderlabs/alpine:3.2 su
   [ $status -eq 1 ]
-  [ "${lines[1]}" = "su: incorrect password" ]
 }
