@@ -40,6 +40,7 @@ build() {
 }
 
 commit() {
+	[[ "$CIRCLE_BRANCH" == "release" ]] || return 0
 	declare rootfs_files="${*:-versions/**/rootfs.tar.gz}"
 	local build_num="${CIRCLE_BUILD_NUM:-nobuild}"
 	local current_branch
@@ -75,6 +76,7 @@ run_tests() {
 }
 
 push() {
+	[[ "$CIRCLE_BRANCH" == "release" ]] || return 0
 	declare build_files="${*:-$OPTIONS}"
 	for file in $build_files; do
 		( source "$file"
