@@ -1,75 +1,67 @@
 #!/usr/bin/env bash
 
-declare BUILD_IMAGE="${BUILD_IMAGE:-alpine-builder}"
-declare BUILD_PREFIX="${BUILD_PREFIX:-alpine-build-}"
-declare OPTIONS="${OPTIONS:-versions/**/options}"
-
 build() {
-	declare build_files="${*:-$OPTIONS}"
-	: "${build_files:?}"
+	declare build_files="${*:-versions/**/options}"
 
-	docker build -t "$BUILD_IMAGE" builder
+	[[ "$BUILDER_IMAGE" ]] || {
+		BUILDER_IMAGE="alpine-builder"
+		docker build -t "$BUILDER_IMAGE" builder
+	}
 
 	for file in $build_files; do
-		( source "$file"
-		local release="$RELEASE"
-		local build="${BUILD_PREFIX}${release}"
-		local build_options="$BUILD_OPTIONS"
-		local version_dir="$(dirname "$file")"
-		local tags="$TAGS"
+		( # shellcheck source=versions/gliderlabs-3.2/options
+		source "$file"
+		local version_dir
+		version_dir="$(dirname "$file")"
+		: "${TAGS:?}" "${BUILD_OPTIONS:?}" "${RELEASE:?}"
+		docker run -e "TRACE=$TRACE" --rm "$BUILDER_IMAGE" "${BUILD_OPTIONS[@]}" \
+			> "$version_dir/rootfs.tar.gz"
 
-		: "${build:?}" "${tags:?}" "${build_options:?}" "${release:?}"
-
-		docker rm "$build" 2>/dev/null || true
-
-		docker run --name "${build}" "$BUILD_IMAGE" $build_options \
-			> "./$version_dir/rootfs.tar.gz"
-
-		for tag in $tags; do
+		for tag in "${TAGS[@]}"; do
 			docker build -t "$tag" "$version_dir"
 			if [[ "$CIRCLE_BUILD_NUM" ]]; then
-				mkdir -p images \
-				&& docker tag -f "$tag" "${tag}-${CIRCLE_BUILD_NUM}" \
-				&& docker save "${tag}-${CIRCLE_BUILD_NUM}" \
-					| gzip -c > "images/${tag//\//_}-${CIRCLE_BUILD_NUM}.tar.gz" \
-				&& docker rmi "${tag}-${CIRCLE_BUILD_NUM}" || true
+				{
+					mkdir -p images \
+					&& docker tag -f "$tag" "${tag}-${CIRCLE_BUILD_NUM}" \
+					&& docker save "${tag}-${CIRCLE_BUILD_NUM}" \
+						| gzip -c > "images/${tag//\//_}-${CIRCLE_BUILD_NUM}.tar.gz" \
+					&& docker rmi "${tag}-${CIRCLE_BUILD_NUM}"
+				} || true
 			fi
-		done
-		docker rm "$build" 2>/dev/null || true )
+		done )
 	done
 }
 
 commit() {
 	[[ "$CIRCLE_BRANCH" == "release" ]] || return 0
-	declare rootfs_files="${*:-versions/**/rootfs.tar.gz}"
+
+	declare rootfs_files="versions/**/rootfs.tar.gz"
 	local build_num="${CIRCLE_BUILD_NUM:-nobuild}"
 	local current_branch
 	current_branch=$(git rev-parse --abbrev-ref HEAD)
+	: "${current_branch:?}"
 
 	for file in $rootfs_files; do
 		local release version_dir
 		release="$(basename "$(dirname "$file")")"
 		version_dir="$(dirname "$file")"
-
-		: "${release:?}" "${current_branch:?}"
-
-		git checkout -B "rootfs-$release"
+		: "${release:?}" "${version_dir:?}"
+		git checkout -B "rootfs/$release" "$current_branch"
 		git add -f -- "$file"
-		git commit -m "pushing release $release for build $build_num"
-		git push -f origin "rootfs-$release"
-		git checkout "$current_branch"
+		git commit -m "release image version $release for build $build_num"
 	done
+	[[ "$NO_PUSH" ]] || git push -f origin 'refs/heads/rootfs/*'
+	git checkout "$current_branch"
 }
 
 run_tests() {
-	declare build_files="${*:-$OPTIONS}"
+	declare build_files="${*:-versions/**/options}"
 	declare -a test_files
 	for file in $build_files; do
+		# shellcheck source=versions/gliderlabs-3.2/options
 		source "$file"
 		local tag
-		tag="$(echo "$TAGS" | cut -d' ' -f1)"
-		tag="${tag//:/-}"
-		tag="${tag//\//_}"
+		tag="${TAGS[0]}" tag="${tag//:/-}" tag="${tag//\//_}"
 		test_files+=("test/test_${tag}.bats")
 	done
 	bats "${test_files[@]}"
@@ -77,12 +69,15 @@ run_tests() {
 
 push() {
 	[[ "$CIRCLE_BRANCH" == "release" ]] || return 0
-	declare build_files="${*:-$OPTIONS}"
+	[[ "$NO_PUSH" ]] && return 0
+
+	declare build_files="${*:-versions/**/options}"
 	for file in $build_files; do
-		( source "$file"
-		for tag in $TAGS; do
-			if docker history $tag &> /dev/null; then
-				[[ $PUSH_IMAGE ]] && docker push $tag
+		( #shellcheck source=versions/gliderlabs-3.2/options
+		source "$file"
+		for tag in "${TAGS[@]}"; do
+			if docker history "$tag" &> /dev/null; then
+				[[ "$PUSH_IMAGE" ]] && docker push "$tag"
 			fi
 		done
 		exit 0 )
@@ -90,16 +85,17 @@ push() {
 }
 
 library() {
-	local refs="$(git ls-remote --heads origin)"
-	echo "# maintainer: Glider Labs <team@gliderlabs.com> (@gliderlabs)"
+	local refs
+	refs="$(git ls-remote --exit-code --heads origin rootfs)"
+	: "${refs:?}"
+
 	for file in versions/library-*/options; do
+		# shellcheck source=versions/library-3.2/options
 		source "$file"
-		local version="${RELEASE#v}"
-		echo
-		for tag in $TAGS; do
-			local tag="$(echo "$tag" | cut -d: -f2)"
-			read sha _ <<< $(echo "$refs" | grep rootfs-library-$version)
-			echo "$tag:" "git://github.com/gliderlabs/docker-alpine@$sha" "versions/library-$version"
+		for tag in "${TAGS[@]}"; do
+			echo "${tag#*:}:" \
+				"git://github.com/gliderlabs/docker-alpine@${refs:0:40}" \
+				"versions/library-${RELEASE#v}"
 		done
 	done
 }
