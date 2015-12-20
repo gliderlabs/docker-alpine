@@ -45,11 +45,71 @@ The `gliderlabs/alpine` has these additional features:
 
 This should help with your image decision. If features of the `gliderlabs/alpine` image are not of importance to you and you value closest to upstream, then stick with `alpine`. If you want to use additional features we add to the image, then you would use `gliderlabs/alpine`.
 
-## Test
+## Testing
 
 The test for images is very simple at the moment. It just attempts to install the `openssl` package and verify we exit cleanly.
 
 Use the `test` sub-command of the `build` utility to run tests on currently build images (`build test`).
 
+### Example
+
+Run tests for a single image:
+
+```console
+$ ./build test versions/gliderlabs-3.2/options
+ ✓ version is correct
+ ✓ package installs cleanly
+ ✓ timezone
+ ✓ apk-install script should be available
+ ✓ repository list is correct
+ ✓ cache is empty
+ ✓ root password is disabled
+
+7 tests, 0 failures
+```
+
+Run all tests:
+
+```console
+$ ./build test
+ ✓ version is correct
+ ✓ package installs cleanly
+ ✓ timezone
+...
+ ✓ apk-install script should be missing
+ ✓ repository list is correct
+ ✓ cache is empty
+ ✓ root password is disabled
+
+84 tests, 0 failures
+```
+
+Run tests in parallel with the `parallel` utility:
+
+```console
+$ parallel ./build test ::: versions/**/options
+1..7
+ok 1 version is correct
+ok 2 package installs cleanly
+ok 3 timezone
+ok 4 apk-install script should be available
+...
+```
+
+## Library
+
+These are the steps we use for updating the official library image:
+
+1. Merge the `master` branch into `release` and push `release`. This will trigger CircleCI to push resulting image tarballs to the `rootfs/*` branches and push the `gliderlabs` organization images directly to Docker Hub.
+1. Verify [the build is green in CircleCI](https://circleci.com/gh/gliderlabs/docker-alpine/tree/release).
+1. Fork the [official images repository][official] and clone it locally if you have not already done so.
+1. Create a new local branch in the `docker-library/official-images` repository for the update to alpine.
+1. Open the `library/alpine` file from `docker-library/official-images`.
+1. Run `./build library` from the `gliderlabs/docker-alpine` folder root to copy the latest version references.
+1. Paste in the updated version references to the `library/alpine` file opened in the `docker-library/official-images` local clone.
+1. Commit and push the changes to your fork.
+1. Open a pull request to the [official images repository][official] repository.
+
 [library]: https://github.com/docker-library/official-images/blob/master/library/alpine
 [fastly]: https://www.fastly.com/
+[official]: https://github.com/docker-library/official-images
