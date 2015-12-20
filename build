@@ -85,13 +85,12 @@ push() {
 }
 
 library() {
-	local refs
-	refs="$(git ls-remote --exit-code --heads origin rootfs)"
-	: "${refs:?}"
-
 	for file in versions/library-*/options; do
 		# shellcheck source=versions/library-3.2/options
 		source "$file"
+		local refs
+		refs="$(git ls-remote --exit-code --heads origin rootfs/library-${RELEASE#v})"
+		: "${refs:?}"
 		for tag in "${TAGS[@]}"; do
 			echo "${tag#*:}:" \
 				"git://github.com/gliderlabs/docker-alpine@${refs:0:40}" \
