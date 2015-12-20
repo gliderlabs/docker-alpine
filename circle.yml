@@ -3,7 +3,7 @@ general:
     - "images"
   branches:
     ignore:
-      - /rootfs-.*/
+      - /rootfs\/.*/
 
 machine:
   pre:

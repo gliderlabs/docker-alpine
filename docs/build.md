@@ -14,6 +14,26 @@ The image is built using a builder Docker container based on the `debian` image.
 
 The build script takes a glob of `options` files as an argument. Each of these files lives in a folder that describes the version of Alpine Linux to build. Each line of the `options` file are the options that will be applied to the resulting image. By default, we use the included glob of `versions/**/options`.
 
+### Example
+
+To build all the images simply run:
+
+```console
+$ ./build
+```
+
+Pass version files to the `build` script to build specific versions:
+
+```console
+$ ./build version/library-3.2/options versions/gliderlabs-3.2/options
+```
+
+With `parallel` available you can speed up building a bit:
+
+```console
+$ parallel -m ./build ::: versions/**/options
+```
+
 ## Differences
 
 As we maintain the [official Alpine Linux image in the Docker Library][library], we have specific `options` files for library versions. These contain options that may differ slightly from the `gliderlabs/alpine` image. Compare the `BUILD_OPTIONS` variable to see differences between versions.
