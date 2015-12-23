@@ -2,13 +2,13 @@
 
 [![CircleCI](https://img.shields.io/circleci/project/gliderlabs/docker-alpine/release.svg)](https://circleci.com/gh/gliderlabs/docker-alpine)
 
-A convenience `build` script is included that builds the image and runs basic tests against the resulting image tags. The script is used in the continuous integration process (check out the CircleCI badge badge link above). But you can run this script locally to build your own images. Be sure to check out the environment variables that can be tweaked at the top of the `build` script file.
+A convenience `build` script is included that builds the image and runs basic tests against the resulting image tags. The script is used in the continuous integration process (check out the CircleCI badge link above). But you can run this script locally to build your own images. Be sure to check out the environment variables that can be tweaked at the top of the `build` script file.
 
 ## Image
 
 ### Builder
 
-The image is built using a builder Docker container based on the `debian` image. This builder image lives in the `builder` sub-directory of the project and uses a `mkimage-alpine.sh` script to generate a Alpine Linux `rootfs.tar.gz` file. This file then gets copied to the root of the project so we can build the main Alpine Linux image by just using the `ADD` command to automatically untar the components to the resulting image.
+The image is built using a builder Docker container based on the `debian` image. This builder image lives in the `builder` sub-directory of the project and uses a `mkimage-alpine.sh` script to generate an Alpine Linux `rootfs.tar.gz` file. This file then gets copied to the root of the project so we can build the main Alpine Linux image by just using the `ADD` command to automatically untar the components to the resulting image.
 
 ### Options
 
@@ -108,7 +108,7 @@ These are the steps we use for updating the official library image:
 1. Run `./build library` from the `gliderlabs/docker-alpine` folder root to copy the latest version references.
 1. Paste in the updated version references to the `library/alpine` file opened in the `docker-library/official-images` local clone.
 1. Commit and push the changes to your fork.
-1. Open a pull request to the [official images repository][official] repository.
+1. Open a pull request to the [official images repository][official].
 
 [library]: https://github.com/docker-library/official-images/blob/master/library/alpine
 [fastly]: https://www.fastly.com/
