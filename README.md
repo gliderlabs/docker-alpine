@@ -58,7 +58,7 @@ ENTRYPOINT ["mysql"]
 This took 19 seconds to build and yields a 164 MB image. Eww. Start doing this:
 
 ```dockerfile
-FROM gliderlabs/alpine:3.2
+FROM gliderlabs/alpine:3.3
 RUN apk --update add mysql-client
 ENTRYPOINT ["mysql"]
 ```
