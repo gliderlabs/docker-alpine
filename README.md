@@ -31,14 +31,14 @@ Collected errors:
 * opkg_install_cmd: Cannot install package nodejs.
 
 $ docker run gliderlabs/alpine apk --update add nodejs
-fetch http://dl-4.alpinelinux.org/alpine/v3.2/main/x86_64/APKINDEX.tar.gz
-(1/5) Installing c-ares (1.10.0-r1)
-(2/5) Installing libgcc (4.8.3-r0)
-(3/5) Installing libstdc++ (4.8.3-r0)
-(4/5) Installing libuv (0.10.29-r0)
-(5/5) Installing nodejs (0.10.33-r0)
-Executing busybox-1.22.1-r14.trigger
-OK: 21 MiB in 20 packages
+fetch http://alpine.gliderlabs.com/alpine/v3.3/main/x86_64/APKINDEX.tar.gz
+fetch http://alpine.gliderlabs.com/alpine/v3.3/community/x86_64/APKINDEX.tar.gz
+(1/4) Installing libgcc (5.3.0-r0)
+(2/4) Installing libstdc++ (5.3.0-r0)
+(3/4) Installing libuv (1.7.5-r0)
+(4/4) Installing nodejs (4.2.3-r0)
+Executing busybox-1.24.1-r7.trigger
+OK: 29 MiB in 15 packages
 ```
 
 This makes Alpine Linux a great image base for utilities and even production applications. [Read more about Alpine Linux here][alpine-about] and you can see how their mantra fits in right at home with Docker images.
