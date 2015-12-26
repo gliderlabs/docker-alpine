@@ -30,7 +30,7 @@ Unknown package 'nodejs'.
 Collected errors:
 * opkg_install_cmd: Cannot install package nodejs.
 
-$ docker run gliderlabs/alpine apk --no-cache add nodejs
+$ docker run gliderlabs/alpine apk add --no-cache nodejs
 fetch http://alpine.gliderlabs.com/alpine/v3.3/main/x86_64/APKINDEX.tar.gz
 fetch http://alpine.gliderlabs.com/alpine/v3.3/community/x86_64/APKINDEX.tar.gz
 (1/4) Installing libgcc (5.3.0-r0)
