@@ -30,7 +30,7 @@ Unknown package 'nodejs'.
 Collected errors:
 * opkg_install_cmd: Cannot install package nodejs.
 
-$ docker run gliderlabs/alpine apk --update add nodejs
+$ docker run gliderlabs/alpine apk add --no-cache nodejs
 fetch http://alpine.gliderlabs.com/alpine/v3.3/main/x86_64/APKINDEX.tar.gz
 fetch http://alpine.gliderlabs.com/alpine/v3.3/community/x86_64/APKINDEX.tar.gz
 (1/4) Installing libgcc (5.3.0-r0)
@@ -59,11 +59,11 @@ This took 19 seconds to build and yields a 164 MB image. Eww. Start doing this:
 
 ```dockerfile
 FROM gliderlabs/alpine:3.3
-RUN apk --update add mysql-client
+RUN apk add --no-cache mysql-client
 ENTRYPOINT ["mysql"]
 ```
 
-Only 3 seconds to build and results in a 16 MB image! Hooray!
+Only 3 seconds to build and results in a 36 MB image! Hooray!
 
 ## Documentation
 
