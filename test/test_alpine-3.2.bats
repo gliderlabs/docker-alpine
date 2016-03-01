@@ -27,7 +27,7 @@ setup() {
 @test "repository list is correct" {
   run docker run "alpine:3.2" cat /etc/apk/repositories
   [ $status -eq 0 ]
-  [ "${lines[0]}" = "http://dl-4.alpinelinux.org/alpine/v3.2/main" ]
+  [ "${lines[0]}" = "http://dl-cdn.alpinelinux.org/alpine/v3.2/main" ]
   [ "${lines[1]}" = "" ]
 }
 
