@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 
 build() {
-	declare build_files="${*:-versions/**/options}"
+	if [[ -z "${DIRECTORY_TO_BUILD}" ]]; then
+		declare build_files="${*:-versions/**/options}"
+	else
+		declare build_files="${*:-versions/$DIRECTORY_TO_BUILD/options}"
+	fi
 
 	[[ "$BUILDER_IMAGE" ]] || {
 		BUILDER_IMAGE="alpine-builder"
