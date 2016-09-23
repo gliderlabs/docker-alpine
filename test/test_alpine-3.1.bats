@@ -41,3 +41,9 @@ setup() {
   run docker run --user nobody "alpine:3.1" su
   [ $status -eq 1 ]
 }
+
+@test "CVE-2016-2183, CVE-2016-6304, CVE-2016-6306" {
+  run docker run alpine:3.1 sh -c 'apk version -t $(apk info -v | grep ^libssl | cut -d- -f2-) 1.0.1u-r0 | grep -q "[=>]"'
+  [ $status -eq 0 ]
+}
+
