@@ -47,3 +47,8 @@ setup() {
   [ $status -eq 0 ]
 }
 
+@test "CVE-2016-7052" {
+  run docker run alpine:3.2 sh -c 'apk version -t $(apk info -v | grep ^libssl | cut -d- -f2-) 1.0.2j-r0 | grep -q "[=>]"'
+  [ $status -eq 0 ]
+}
+
