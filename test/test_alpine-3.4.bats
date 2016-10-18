@@ -5,7 +5,7 @@ setup() {
 @test "version is correct" {
   run docker run alpine:3.4 cat /etc/os-release
   [ $status -eq 0 ]
-  [ "${lines[2]}" = "VERSION_ID=3.4.3" ]
+  [ "${lines[2]}" = "VERSION_ID=3.4.4" ]
 }
 
 @test "package installs cleanly" {
@@ -42,3 +42,14 @@ setup() {
   run docker run --user nobody alpine:3.4 su
   [ $status -eq 1 ]
 }
+
+@test "CVE-2016-2183, CVE-2016-6304, CVE-2016-6306" {
+  run docker run alpine:3.4 sh -c 'apk version -t $(apk info -v | grep ^libssl | cut -d- -f2-) 1.0.2i-r0 | grep -q "[=>]"'
+  [ $status -eq 0 ]
+}
+
+@test "CVE-2016-7052" {
+  run docker run alpine:3.4 sh -c 'apk version -t $(apk info -v | grep ^libssl | cut -d- -f2-) 1.0.2j-r0 | grep -q "[=>]"'
+  [ $status -eq 0 ]
+}
+
