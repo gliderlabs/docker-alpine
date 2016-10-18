@@ -43,8 +43,3 @@ setup() {
   [ $status -eq 1 ]
 }
 
-@test "CVE-2016-2183, CVE-2016-6304, CVE-2016-6306" {
-  run docker run alpine:edge sh -c 'apk version -t $(apk info -v | grep ^libssl | cut -d- -f2-) 1.0.2i-r0 | grep -q "[=>]"'
-  [ $status -eq 0 ]
-}
-
