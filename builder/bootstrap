@@ -1,0 +1,219 @@
+#!/bin/bash
+set -e
+
+#######
+##
+##  This script will bootstrap a clean unadulterated alpine builder. 
+##  Author: moos3 <richard@guthnur.net>
+##
+#######
+
+### Update this keys as needed. 
+key_sha256sums="9c102bcc376af1498d549b77bdbfa815ae86faa1d2d82f040e616b18ef2df2d4  alpine-devel@lists.alpinelinux.org-4a6a0840.rsa.pub
+2adcf7ce224f476330b5360ca5edb92fd0bf91c92d83292ed028d7c4e26333ab  alpine-devel@lists.alpinelinux.org-4d07755e.rsa.pub
+ebf31683b56410ecc4c00acd9f6e2839e237a3b62b5ae7ef686705c7ba0396a9  alpine-devel@lists.alpinelinux.org-5243ef4b.rsa.pub
+1bb2a846c0ea4ca9d0e7862f970863857fc33c32f5506098c636a62a726a847b  alpine-devel@lists.alpinelinux.org-524d27bb.rsa.pub
+12f899e55a7691225603d6fb3324940fc51cd7f133e7ead788663c2b7eecb00c  alpine-devel@lists.alpinelinux.org-5261cecb.rsa.pub"
+
+get_static_apk () {
+    wget="wget -q -O -"
+    pkglist=apk-tools-static:alpine-baselayout:musl-utils:apk-keys
+    auto_repo_dir=
+
+    if [ -z "$repository" ]; then
+        url=http://dl-4.alpinelinux.org/alpine/
+	yaml_path="latest-stable/releases/$apk_arch/latest-releases.yaml"
+        if [ -z "$release" ]; then
+            echo -n "Determining the latest release... "
+            release=$($wget $url/$yaml_path | \
+          awk '$1 == "branch:" {print $2; exit 0}')
+            if [ -z "$release" ]; then
+                release=$($wget $url/.latest.$apk_arch.txt | \
+                    cut -d " " -f 3 | cut -d / -f 1 | uniq)
+            fi
+            if [ -z "$release" ]; then
+                echo failed
+                return 1
+            fi
+            echo "Alpine release: $release"
+        fi
+        auto_repo_dir=$release/main
+        repository=$url/$auto_repo_dir
+        pkglist=$pkglist:alpine-mirrors
+    fi
+
+    echo "Using static apk from $repository/$apk_arch"
+    wget="$wget $repository/$apk_arch"
+    echo "running $wget"
+    # parse APKINDEX to find the current versions
+    static_pkgs=$($wget/APKINDEX.tar.gz | \
+        tar -Oxz APKINDEX | \
+        awk -F: -v pkglist=$pkglist '
+            BEGIN { split(pkglist,pkg) }
+            $0 != "" { f[$1] = $2 }
+            $0 == "" { for (i in pkg)
+                           if (pkg[i] == f["P"])
+                               print(f["P"] "-" f["V"] ".apk") }')
+    [ "$static_pkgs" ] || return 1
+
+    mkdir -p "$rootfs" || return 1
+
+    for pkg in $static_pkgs; do
+        echo "Downloading $pkg"
+        $wget/$pkg | tar -xz -C "$rootfs"
+    done
+
+    # clean up .apk meta files
+    rm -f "$rootfs"/.[A-Z]*
+
+    # verify checksum of the key
+    keyname=$(echo $rootfs/sbin/apk.static.*.pub | sed 's/.*\.SIGN\.RSA\.//')
+    checksum=$(echo "$key_sha256sums" |  grep -w "$keyname")
+    if [ -z "$checksum" ]; then
+        echo "ERROR: checksum is missing for $keyname"
+        return 1
+    fi
+    mkdir $rootfs/etc/apk/keys
+    cp -a ./keys/* $rootfs/etc/apk/keys
+    (cd $rootfs/etc/apk/keys && echo "$checksum" | sha256sum -c -) || return 1
+
+    # verify the static apk binary signature
+    APK=$rootfs/sbin/apk.static
+    openssl dgst -sha1 -verify $rootfs/etc/apk/keys/$keyname \
+        -signature "$APK.SIGN.RSA.$keyname" "$APK" || return 1
+
+    if [ "$auto_repo_dir" ]; then
+        mirror_list=$rootfs/usr/share/alpine-mirrors/MIRRORS.txt
+        mirror_count=$(wc -l $mirror_list | cut -d " " -f 1)
+        random=$(hexdump -n 2 -e '/2 "%u"' /dev/urandom)
+        repository=$(sed $(expr $random % $mirror_count + 1)\!d \
+            $mirror_list)$auto_repo_dir
+        echo "Selecting mirror $repository"
+    fi
+}
+
+install_alpine() {
+    mkdir -p "$rootfs"/etc/apk || return 1
+    : ${keys_dir:=/etc/apk/keys}
+    if ! [ -d "$rootfs"/etc/apk/keys ] && [ -d "$keys_dir" ]; then
+        cp -r "$keys_dir" "$rootfs"/etc/apk/keys
+    fi
+    if [ -n "$repository" ]; then
+        echo "$repository" > "$rootfs"/etc/apk/repositories
+    else
+        cp /etc/apk/repositories "$rootfs"/etc/apk/repositories || return 1
+        if [ -n "$release" ]; then
+            sed -E -i "s:/[^/]+/([^/]+)$:/$release/\\1:" \
+                "$rootfs"/etc/apk/repositories
+        fi
+    fi
+    opt_arch=
+    if [ -n "$apk_arch" ]; then
+        opt_arch="--arch $apk_arch"
+   fi
+    $APK add -U --initdb --root $rootfs $opt_arch "$@" alpine-base
+}
+
+package_image() {
+    tar -czf rootfs.tar.gz --numeric-owner -C rootfs/ .
+    rm -rf rootfs
+}
+
+die() {
+    echo "$@" >&2
+    exit 1
+}
+
+usage() {
+    cat >&2 <<EOF
+Usage: $(basename $0) [-h|--help] [-r|--repository <url>]
+                   [-R|--release <release>] [-a|--arch <arch>]
+                   [PKG...]
+EOF
+}
+
+usage_err() {
+    usage
+    exit 1
+}
+
+build_docker(){
+	echo "Building docker image"
+	docker build -t alpine:base -f Dockerfile.builder . && rm rootfs.tar.gz
+	docker build -t alpine:builder -f Dockerfile .
+}
+
+rootfs="$(pwd)/rootfs"
+release=
+arch=$(uname -m)
+
+# template requires root
+if [ $(id -u) -ne 0 ]; then
+   echo "$(basename $0): must be run as root" >&2
+   exit 1
+fi
+
+options=$(getopt -o h:r:R:a: -l help,repository:,release:,arch: -- "$@")
+[ $? -eq 0 ] || usage_err
+eval set -- "$options"
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+    -h|--help)
+        usage
+        exit 0
+        ;;
+    -r|--repository)
+        repository=$2
+  ;;
+    -R|--release)
+        release=$2
+        ;;
+    -a|--arch)
+        arch=$2
+        ;;
+    --)
+  shift
+        break;;
+    esac
+    shift 2
+done
+
+
+if [ -z "$rootfs" ]; then
+    rootfs="$(pwd)/rootfs"
+fi
+
+## Verify BootStrap Script
+checkSha=`cat .bootstrap.check`
+fileCheck=`openssl sha1 $(pwd)/bootstrap | awk '{print $2}'`
+if [ $fileCheck != $checkSha ]; then
+  die "Failed to verify bootstap, File could have been tampered with!!!!!!"
+fi
+
+apk_arch=$arch
+
+case "$arch" in
+    i[3-6]86)
+        apk_arch=x86
+        ;;
+    x86)
+        ;;
+    x86_64|"")
+        ;;
+    arm*)
+        apk_arch=armhf
+        ;;
+    *)
+        die "unsupported architecture: $arch"
+        ;;
+esac
+
+: ${APK:=apk}
+if ! which $APK >/dev/null; then
+    get_static_apk || die "Failed to download a valid static apk"
+fi
+
+install_alpine "$@" || die "Failed to install rootfs"
+package_image || die "Failed to package image"
+build_docker || die "Failed to build docker container"
