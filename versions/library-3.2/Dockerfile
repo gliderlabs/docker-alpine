@@ -1,3 +1,3 @@
 FROM scratch
-ADD rootfs.tar.gz /
+ADD rootfs.tar.xz /
 CMD ["/bin/sh"]
