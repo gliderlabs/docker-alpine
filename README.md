@@ -15,10 +15,10 @@ Docker images today are big. Usually much larger than they need to be. There are
 
 ```
 REPOSITORY          TAG           IMAGE ID          VIRTUAL SIZE
-gliderlabs/alpine   latest        157314031a17      4.803 MB
-debian              latest        4d6ce913b130      123.1 MB
-ubuntu              latest        b39b81afc8ca      129 MB
-centos              latest        8efe422e6104      191.8 MB
+gliderlabs/alpine   latest        9cfff538e583      4.803 MB
+debian              latest        19134a8202e7      123.1 MB
+ubuntu              latest        104bec311bcd      129 MB
+centos              latest        67591570dd29      191.8 MB
 ```
 
 There are images such as `progrium/busybox` which get us very close to a minimal container and package system. But these particular BusyBox builds piggyback on the OpenWRT package index which is often lacking and not tailored towards generic everyday applications. Alpine Linux has a much more complete and up to date [package index][alpine-packages]:
