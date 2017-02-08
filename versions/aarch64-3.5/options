@@ -1,5 +1,5 @@
 export RELEASE="v3.5"
-export ARCH="armhf"
+export ARCH="aarch64"
 export MIRROR="http://dl-cdn.alpinelinux.org/alpine"
 export PACKAGES="alpine-baselayout,alpine-keys,apk-tools,libc-utils"
 export BUILDER_IMAGE="alpine-builder-${ARCH}"
