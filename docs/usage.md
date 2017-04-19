@@ -45,12 +45,12 @@ CMD ["nginx", "-g", "daemon off;"]
 
 This avoids the need to use `--update` and remove `/var/cache/apk/*` when done installing packages.
 
-## Convenience Cleanup
+## Convenience Cleanup (For alpine <3.3)
 
-The `gliderlabs` variant of this image contains a small unofficial wrapper script that assists in the cleanup of the package index after installing packages. A great minimalist cleans up after ones self. Thus, the `apk-install` script was born. Here is another simple `Dockerfile` that installs the `nginx` package and removes package index data:
+The `gliderlabs` variant of this image contains a small unofficial wrapper script that assists in the cleanup of the package index after installing packages if you use alpine <3.3. A great minimalist cleans up after ones self. Thus, the `apk-install` script was born. Here is another simple `Dockerfile` that installs the `nginx` package and removes package index data:
 
 ```
-FROM gliderlabs/alpine:3.3
+FROM gliderlabs/alpine:3.2
 
 RUN apk-install nginx
 
