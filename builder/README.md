@@ -1,3 +1,13 @@
+# Alpine Linux Bootstrap Builder
+
+This bootstrap generates a clean rootfs and docker container. 
+
+## Options
+* `-r | --repository <repo>`: Custom Alpine Linux Repo
+* `-R | --release <release>`: Set release version instead of the default latest-stable
+* `-a | --arch <arch>`: Set the arch for the rootfs image that is needed
+
+
 # Alpine Linux rootfs Builder
 
 This builder image constructs a Alpine Linux `rootfs.tar.gz` for us to use when building the base Alpine Linux image. The `mkimage-alpine.sh` script does all the heavy lifting. During the configuration of the image we add our `apk-install` convenience script.
