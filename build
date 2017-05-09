@@ -15,7 +15,7 @@ build() {
 		version_dir="$(dirname "$file")"
 		: "${TAGS:?}" "${BUILD_OPTIONS:?}" "${RELEASE:?}"
 		docker run -e "TRACE=$TRACE" --rm "$BUILDER_IMAGE" "${BUILD_OPTIONS[@]}" \
-			> "$version_dir/rootfs.tar.gz"
+			> "$version_dir/rootfs.tar.xz"
 
 		for tag in "${TAGS[@]}"; do
 			docker build -t "$tag" "$version_dir"
@@ -24,7 +24,7 @@ build() {
 					mkdir -p images \
 					&& docker tag -f "$tag" "${tag}-${CIRCLE_BUILD_NUM}" \
 					&& docker save "${tag}-${CIRCLE_BUILD_NUM}" \
-						| gzip -c > "images/${tag//\//_}-${CIRCLE_BUILD_NUM}.tar.gz" \
+						| xz -9e > "images/${tag//\//_}-${CIRCLE_BUILD_NUM}.tar.xz" \
 					&& docker rmi "${tag}-${CIRCLE_BUILD_NUM}"
 				} || true
 			fi
@@ -35,7 +35,7 @@ build() {
 commit() {
 	[[ "$CIRCLE_BRANCH" == "release" ]] || return 0
 
-	declare rootfs_files="versions/**/rootfs.tar.gz"
+	declare rootfs_files="versions/**/rootfs.tar.xz"
 	local build_num="${CIRCLE_BUILD_NUM:-nobuild}"
 	local current_branch
 	current_branch=$(git rev-parse --abbrev-ref HEAD)
