@@ -1,5 +1,5 @@
 export RELEASE="edge"
-export MIRROR="http://dl-cdn.alpinelinux.org/alpine"
+export MIRROR="https://dl-cdn.alpinelinux.org/alpine"
 export PACKAGES="alpine-baselayout,apk-tools,alpine-keys,libc-utils"
 export BUILD_OPTIONS=(-b -s -t UTC -r $RELEASE -m $MIRROR -p $PACKAGES)
 export TAGS=(alpine:edge)
