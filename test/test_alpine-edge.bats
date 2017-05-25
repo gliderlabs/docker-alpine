@@ -5,7 +5,7 @@ setup() {
 @test "version is correct" {
   run docker run "alpine:edge" cat /etc/os-release
   [ $status -eq 0 ]
-  [ "${lines[2]}" = "VERSION_ID=3.5.0" ]
+  [ "${lines[2]}" = "VERSION_ID=3.6.0" ]
 }
 
 @test "package installs cleanly" {
