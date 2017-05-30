@@ -15,7 +15,7 @@ Docker images today are big. Usually much larger than they need to be. There are
 
 ```
 REPOSITORY          TAG           IMAGE ID          VIRTUAL SIZE
-gliderlabs/alpine   latest        9cfff538e583      4.803 MB
+alpine              latest        9cfff538e583      4.803 MB
 debian              latest        19134a8202e7      123.1 MB
 ubuntu              latest        104bec311bcd      129 MB
 centos              latest        67591570dd29      191.8 MB
@@ -29,7 +29,7 @@ Unknown package 'nodejs'.
 Collected errors:
 * opkg_install_cmd: Cannot install package nodejs.
 
-$ docker run gliderlabs/alpine apk add --no-cache nodejs
+$ docker run alpine apk add --no-cache nodejs
 fetch http://alpine.gliderlabs.com/alpine/v3.3/main/x86_64/APKINDEX.tar.gz
 fetch http://alpine.gliderlabs.com/alpine/v3.3/community/x86_64/APKINDEX.tar.gz
 (1/4) Installing libgcc (5.3.0-r0)
@@ -57,7 +57,7 @@ ENTRYPOINT ["mysql"]
 This took 19 seconds to build and yields a 164 MB image. Eww. Start doing this:
 
 ```dockerfile
-FROM gliderlabs/alpine:3.4
+FROM alpine:3.6
 RUN apk add --no-cache mysql-client
 ENTRYPOINT ["mysql"]
 ```
@@ -94,5 +94,5 @@ The code in this repository, unless otherwise noted, is BSD licensed. See the `L
 [issues]: https://github.com/gliderlabs/docker-alpine/issues
 [alpine]: http://alpinelinux.org/
 [fastly]: https://www.fastly.com/
-[hub]: https://hub.docker.com/r/gliderlabs/alpine/
+[hub]: https://hub.docker.com/r/_/alpine/
 <img src="https://ga-beacon.appspot.com/UA-58928488-2/docker-alpine/readme?pixel" />
