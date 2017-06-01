@@ -1,5 +1,5 @@
 export RELEASE="v3.1"
-export MIRROR="http://alpine.gliderlabs.com/alpine"
+export MIRROR="https://alpine.gliderlabs.com/alpine"
 export BUILD_OPTIONS=(-d -s -E -c -t UTC -r $RELEASE -m $MIRROR)
 export TAGS=(gliderlabs/alpine:3.1)
 export PUSH_IMAGE="true"
