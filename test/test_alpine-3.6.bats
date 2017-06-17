@@ -5,7 +5,7 @@ setup() {
 @test "version is correct" {
   run docker run alpine:3.6 cat /etc/os-release
   [ $status -eq 0 ]
-  [ "${lines[2]}" = "VERSION_ID=3.6.1" ]
+  [ "${lines[2]}" = "VERSION_ID=3.6.2" ]
 }
 
 @test "package installs cleanly" {
@@ -42,4 +42,3 @@ setup() {
   run docker run --user nobody alpine:3.6 su
   [ $status -eq 1 ]
 }
-
