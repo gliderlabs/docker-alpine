@@ -3,17 +3,19 @@
 build() {
 	declare build_files="${*:-versions/**/options}"
 
-	[[ "$BUILDER_IMAGE" ]] || {
-		BUILDER_IMAGE="alpine-builder"
-		docker build -t "$BUILDER_IMAGE" builder
-	}
-
 	for file in $build_files; do
 		( # shellcheck source=versions/gliderlabs-3.2/options
+        unset RELEASE ARCH MIRROR PACKAGES BUILDER_IMAGE BUILD_OPTIONS TAGS
 		source "$file"
 		local version_dir
 		version_dir="$(dirname "$file")"
-		: "${TAGS:?}" "${BUILD_OPTIONS:?}" "${RELEASE:?}"
+		: "${TAGS:?}" "${BUILD_OPTIONS:?}" "${RELEASE:?}" "${ARCH:-x86}"
+        ARCH=${ARCH:-x86}
+        [[ "$BUILDER_IMAGE" ]] || BUILDER_IMAGE="alpine-builder-${ARCH}"
+        [[ "$(docker images $BUILDER_IMAGE -q) 2> /dev/null)" == "" ]] || {
+            BUILDER_IMAGE="alpine-builder-${ARCH}"
+            docker build -t "$BUILDER_IMAGE" builder -f "builder/Dockerfile-${ARCH}"
+        }
 		docker run -e "TRACE=$TRACE" --rm "$BUILDER_IMAGE" "${BUILD_OPTIONS[@]}" \
 			> "$version_dir/rootfs.tar.xz"
 
