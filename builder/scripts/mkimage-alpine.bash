@@ -15,11 +15,11 @@ set -eo pipefail; [[ "$TRACE" ]] && set -x
 }
 
 usage() {
-	printf >&2 '%s: [-r release] [-m mirror] [-s] [-E] [-e] [-c] [-d] [-t timezone] [-p packages] [-b]\n' "$0" && exit 1
+	printf >&2 '%s: [-r release] [-m mirror] [-a arch] [-s] [-E] [-e] [-c] [-d] [-t timezone] [-p packages] [-b]\n' "$0" && exit 1
 }
 
 build() {
-	declare mirror="$1" rel="$2" packages=("${3:-alpine-base}")
+	declare mirror="$1" rel="$2" packages=("${3:-alpine-base}") arch="${4:-x86_64}"
 
 	local rootfs
 	rootfs="$(mktemp -d "${TMPDIR:-/var/tmp}/alpine-docker-rootfs-XXXXXXXXXX")"
@@ -39,10 +39,10 @@ build() {
 	{
 		# shellcheck disable=SC2086
 		apk --root "$rootfs" --update-cache --keys-dir /etc/apk/keys \
-			add --initdb ${packages[*]//,/ }
+			add --arch $arch --initdb ${packages[*]//,/ }
 		[[ "$ADD_BASELAYOUT" ]] && \
 			apk --root "$rootfs" --keys-dir /etc/apk/keys \
-				fetch --stdout alpine-base | tar -xvz -C "$rootfs" etc
+				fetch --stdout --arch $arch alpine-base | tar -xvz -C "$rootfs" etc
 		rm -f "$rootfs/var/cache/apk"/*
 		[[ "$TIMEZONE" ]] && \
 			cp "/usr/share/zoneinfo/$TIMEZONE" "$rootfs/etc/localtime"
@@ -60,7 +60,7 @@ build() {
 }
 
 main() {
-	while getopts "hr:m:t:sEecdp:b" opt; do
+	while getopts "hr:m:t:sEecdp:ba:" opt; do
 		case $opt in
 			r) REL="$OPTARG";;
 			m) MIRROR="${OPTARG%/}";;
@@ -72,11 +72,12 @@ main() {
 			p) PACKAGES="$OPTARG";;
 			b) ADD_BASELAYOUT=1;;
 			d) DISABLE_ROOT_PASSWD=1;;
+			a) ARCH="$OPTARG";;
 			*) usage;;
 		esac
 	done
 
-	build "$MIRROR" "$REL" "$PACKAGES"
+	build "$MIRROR" "$REL" "$PACKAGES" "$ARCH"
 }
 
 main "$@"
