@@ -14,21 +14,35 @@ build() {
 		local version_dir
 		version_dir="$(dirname "$file")"
 		: "${TAGS:?}" "${BUILD_OPTIONS:?}" "${RELEASE:?}"
-		docker run -e "TRACE=$TRACE" --rm "$BUILDER_IMAGE" "${BUILD_OPTIONS[@]}" \
-			> "$version_dir/rootfs.tar.xz"
 
-		for tag in "${TAGS[@]}"; do
-			docker build -t "$tag" "$version_dir"
-			if [[ "$CIRCLE_BUILD_NUM" ]]; then
-				{
-					mkdir -p images \
-					&& docker tag -f "$tag" "${tag}-${CIRCLE_BUILD_NUM}" \
-					&& docker save "${tag}-${CIRCLE_BUILD_NUM}" \
-						| xz -9e > "images/${tag//\//_}-${CIRCLE_BUILD_NUM}.tar.xz" \
-					&& docker rmi "${tag}-${CIRCLE_BUILD_NUM}"
-				} || true
-			fi
+		[[ "$ARCHS" ]] || { # compatability with older configs that were only written for x86_64 architectures
+				ARCHS=("x86_64")
+		}
+
+		for arch in "${ARCHS[@]}"; do
+			# Generate rootfs
+			mkdir -p "$version_dir/$arch"
+			docker run -e "TRACE=$TRACE" --rm "$BUILDER_IMAGE" -a $arch "${BUILD_OPTIONS[@]}" \
+				> "$version_dir/$arch/rootfs.tar.xz"
+			cp "$version_dir/Dockerfile" "$version_dir/$arch/Dockerfile" # so we can point the builder bots at one directory to build our image. AFAIK docker doesn't follow symlinks
+
+			# Build + tag images
+			for tag in "${TAGS[@]}"; do
+				# TODO: how to manage tags + orgs locally on the builder, for pushing the gliderlabs images later
+				# Currently, the last built architecture image will overwrite the tags of the others
+				docker build -t "$tag" "$version_dir/$arch"
+				if [[ "$CIRCLE_BUILD_NUM" ]]; then
+					{
+						mkdir -p images \
+						&& docker tag -f "$tag" "${tag}-${CIRCLE_BUILD_NUM}" \
+						&& docker save "${tag}-${CIRCLE_BUILD_NUM}" \
+							| xz -9e > "images/${tag//\//_}-${CIRCLE_BUILD_NUM}.tar.xz" \
+						&& docker rmi "${tag}-${CIRCLE_BUILD_NUM}"
+					} || true
+				fi
+			done
 		done )
+
 	done
 }
 
