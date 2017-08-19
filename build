@@ -28,9 +28,14 @@ build() {
 
 			# Build + tag images
 			for tag in "${TAGS[@]}"; do
-				# TODO: how to manage tags + orgs locally on the builder, for pushing the gliderlabs images later
-				# Currently, the last built architecture image will overwrite the tags of the others
-				docker build -t "$tag" "$version_dir/$arch"
+				# Currently, we just tag the x86_64 images as they were before, and tag the others with their architecture
+				# This means that the gliderlabs repos/orgs will not have multi-arch images yet, but they have the options to do so in the future.
+				if [[ "$arch" = "x86_64" ]]; then
+					docker build -t "$tag" "$version_dir/$arch"
+				else
+					docker build -t "$tag-$arch" "$version_dir/$arch"
+				fi
+
 				if [[ "$CIRCLE_BUILD_NUM" ]]; then
 					{
 						mkdir -p images \
