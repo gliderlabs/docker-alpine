@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+shopt -s globstar
+
 build() {
 	declare build_files="${*:-versions/**/options}"
 
