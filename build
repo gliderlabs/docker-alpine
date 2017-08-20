@@ -13,7 +13,7 @@ build() {
 		source "$file"
 		local version_dir
 		version_dir="$(dirname "$file")"
-		: "${TAGS:?}" "${BUILD_OPTIONS:?}" "${RELEASE:?}"
+		: "${TAGS:?}" "${BUILD_OPTIONS:?}" "${RELEASE:?}" # Maybe require $ARCHS in the future?
 
 		[[ "$ARCHS" ]] || { # compatability with older configs that were only written for x86_64 architectures
 				ARCHS=("x86_64")
@@ -22,7 +22,7 @@ build() {
 		for arch in "${ARCHS[@]}"; do
 			# Generate rootfs
 			mkdir -p "$version_dir/$arch"
-			docker run -e "TRACE=$TRACE" --rm "$BUILDER_IMAGE" -a $arch "${BUILD_OPTIONS[@]}" \
+			docker run -e "TRACE=$TRACE" --rm "$BUILDER_IMAGE" -a "$arch" "${BUILD_OPTIONS[@]}" \
 				> "$version_dir/$arch/rootfs.tar.xz"
 			cp "$version_dir/Dockerfile" "$version_dir/$arch/Dockerfile" # so we can point the builder bots at one directory to build our image. AFAIK docker doesn't follow symlinks
 
@@ -108,11 +108,11 @@ library() {
 	convert() {
 		# takes a space-separated list of alpine-linux architectures, and returns a space-separated list of docker architectures
 		local i=0
-		for arch in $@; do
+		for arch in "$@"; do
 			case "$arch" in # converts Alpine Linux arch strings to Docker arch strings
 				x86_64) echo -n "amd64";;
 				x86) echo -n "i386";;
-				armhf) echo -n "arm32v7";; # TODO: What about arm32v7
+				armhf) echo -n "arm32v7";; # TODO: What about arm32v6?
 				aarch64) echo -n "arm64v8";;
 				ppc64le) echo -n "ppc64le";;
 				s390x) echo -n "s390x";;
@@ -137,20 +137,22 @@ library() {
 		local refs
 		refs="$(git ls-remote --exit-code --heads origin rootfs/library-${RELEASE#v})"
 		: "${refs:?}"
-		tags=${TAGS[@]}
-		[[ "$ARCHS" ]] || { # compatability with older configs that were only written for x86_64 architectures
+		tags="${TAGS[*]}"
+		[[ "${ARCHS[*]}" ]] || { # compatability with older configs that were only written for x86_64 architectures
 				ARCHS=("x86_64")
 		}
-		a=$(convert ${ARCHS[@]})
+		a="$(convert "${ARCHS[@]}")"
 
-		printf "\nTags:" && echo ${tags// /, }
-		echo "Architectures:" ${a// /, }
-		echo "GitCommit:" ${refs:0:40}
+		echo
+		echo "Tags: ${tags// /, }"
+		echo "Architectures: ${a// /, }"
+		echo "GitCommit: ${refs:0:40}"
 
 		local i=0
 		for arch in $a; do
-			printf "%s-Directory: " "$arch"
-			echo "versions/library-${RELEASE#v}/${ARCHS[i]}"
+			# ${ARCHS[i]} is the alpine version string, different from $archs, the docker version string.
+			# Our folder structure is based on the alpine version string
+			echo "$arch-Directory: versions/library-${RELEASE#v}/${ARCHS[i]}"
 			let i=i+1
 		done
 	done
