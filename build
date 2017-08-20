@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-shopt -s globstar
-
 build() {
 	declare build_files="${*:-versions/**/options}"
 
@@ -56,21 +54,34 @@ build() {
 commit() {
 	[[ "$CIRCLE_BRANCH" == "release" ]] || return 0
 
-	declare rootfs_files="versions/**/rootfs.tar.xz"
+	declare options_files="versions/**/options"
 	local build_num="${CIRCLE_BUILD_NUM:-nobuild}"
 	local current_branch
 	current_branch=$(git rev-parse --abbrev-ref HEAD)
 	: "${current_branch:?}"
 
-	for file in $rootfs_files; do
+	for file in $options_files; do
 		local release version_dir
 		release="$(basename "$(dirname "$file")")"
 		version_dir="$(dirname "$file")"
+		local release_dirs="$version_dir/**/"
+
 		: "${release:?}" "${version_dir:?}"
 		git checkout -B "rootfs/$release" "$current_branch"
-		git add -f -- "$file"
+
+		# determine if glob has matches
+		if compgen -G "$release_dirs" > /dev/null; then
+			git add -f -- $release_dirs
+		elif [[ -e "$version_dir/rootfs.tar.xz" ]]; then
+			git add -f -- "$version_dir/rootfs.tar.xz"
+		else
+			echo "No files found for release: $release"
+			continue
+		fi
+
 		git commit -m "release image version $release for build $build_num"
 	done
+
 	[[ "$NO_PUSH" ]] || git push -f origin 'refs/heads/rootfs/*'
 	git checkout "$current_branch"
 }
