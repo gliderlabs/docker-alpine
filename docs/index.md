@@ -4,7 +4,6 @@
 [![Docker Stars](https://img.shields.io/docker/stars/gliderlabs/alpine.svg)][hub]
 [![Docker Pulls](https://img.shields.io/docker/pulls/gliderlabs/alpine.svg)][hub]
 [![Slack](http://glider-slackin.herokuapp.com/badge.svg)][slack]
-[![ImageLayers](https://imagelayers.io/badge/gliderlabs/alpine:latest.svg)](https://imagelayers.io/?images=gliderlabs/alpine:latest 'Get your own badge on imagelayers.io')
 
 
 Welcome to the documentation for the Alpine Linux Docker Image. Here we explain a bit about the motivations behind this image, how you typically use it, the build process, and how to make great minimalist containers!

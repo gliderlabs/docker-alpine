@@ -4,7 +4,6 @@
 [![Docker Stars](https://img.shields.io/docker/stars/gliderlabs/alpine.svg)][hub]
 [![Docker Pulls](https://img.shields.io/docker/pulls/gliderlabs/alpine.svg)][hub]
 [![Slack](http://glider-slackin.herokuapp.com/badge.svg)][slack]
-[![ImageLayers](https://imagelayers.io/badge/gliderlabs/alpine:latest.svg)](https://imagelayers.io/?images=gliderlabs/alpine:latest 'Get your own badge on imagelayers.io')
 
 
 A super small Docker image based on [Alpine Linux][alpine]. The image is only 5 MB and has access to a package repository that is much more complete than other BusyBox based images.
