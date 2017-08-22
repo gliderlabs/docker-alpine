@@ -16,3 +16,4 @@ The builder takes several options:
 * `-t <timezone>`: Sets the timezone.
 * `-p <packages>`: Comma-separated packages list. Default is `alpine-base`.
 * `-b`: Extracts `alpine-base` to the rootfs without dependencies. For images slimmed down with `-p` which still want `/etc/*-release` and `/etc/issue`.
+* `-a <architecture>`: Changes the architecture of the rootfs to download. Default is `x86_64`
