@@ -1,6 +1,7 @@
 version: 2
 jobs:
   build:
+    parallelism: 4
     branches:
       ignore:
         - /rootfs\/.*/
