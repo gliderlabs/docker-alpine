@@ -9,7 +9,9 @@ build() {
 	}
 
   # Setup binfmt_misc
-  [[ grep -q binfmt /proc/mounts ]] || mount binfmt_misc -t binfmt_misc /proc/sys/fs/binfmt_misc
+  if [[ ! grep -q binfmt /proc/mounts ]]; then
+    mount binfmt_misc -t binfmt_misc /proc/sys/fs/binfmt_misc
+  fi
 
   echo "binfmt_misc status:"
   cat /proc/sys/fs/binfmt_misc/status
