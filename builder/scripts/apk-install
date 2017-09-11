@@ -1,2 +1,10 @@
 #!/bin/sh
+
+os_version = `cat /etc/os-release | grep VERSION_ID | cut -d= -f2`
+version () { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
+
+if [ $(version $os_version) -ge $(version "3.3.0") ]; then
+  echo "WARNING: this script is deprecated and would be removed in future version."
+  echo "If your alpine version is >= 3.3 Prefer the new way of doing it, and use --no-cache option"
+fi
 apk add --update "$@" && rm -rf /var/cache/apk/*
