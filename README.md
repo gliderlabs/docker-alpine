@@ -80,7 +80,7 @@ The motivation for this project and modifications to `mkimage.sh` are highly ins
 
 [![Fastly](https://github.com/gliderlabs/docker-alpine/raw/master/logo_fastly.png)][fastly]
 
-[Fastly][fastly] provides the CDN for our Alpine Linux package repository. This is allows super speedy package downloads from all over the globe!
+[Fastly][fastly] provides the CDN for our Alpine Linux package repository. This allows super speedy package downloads from all over the globe!
 
 ## License
 
