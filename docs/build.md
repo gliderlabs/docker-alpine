@@ -14,6 +14,10 @@ The image is built using a builder Docker container based on the `debian` image.
 
 The build script takes a glob of `options` files as an argument. Each of these files lives in a folder that describes the version of Alpine Linux to build. Each line of the `options` file are the options that will be applied to the resulting image. By default, we use the included glob of `versions/**/options`.
 
+### Multi-arch
+
+Each options file specifies a version of the image to build. An options file can generate images for multiple architectures using the `ARCHS` variable.
+
 ### Example
 
 To build all the images simply run:
