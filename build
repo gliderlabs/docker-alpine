@@ -8,19 +8,6 @@ build() {
 		docker build -t "$BUILDER_IMAGE" builder
 	}
 
-  # Setup binfmt_misc
-  if [[ ! grep -q binfmt /proc/mounts ]]; then
-    mount binfmt_misc -t binfmt_misc /proc/sys/fs/binfmt_misc
-  fi
-
-  echo "binfmt_misc status:"
-  cat /proc/sys/fs/binfmt_misc/status
-
-  # Setup cross-docker. See https://github.com/justincormack/cross-docker
-  # Uses binfmt_misc magic kernel stuff to run docker images of different architectures
-  curl https://raw.githubusercontent.com/justincormack/cross-docker/master/cross-docker > ./cross-docker.sh
-  chmod +x ./cross-docker.sh
-
 	for file in $build_files; do
 		( # shellcheck source=versions/gliderlabs-3.2/options
 		source "$file"
@@ -35,7 +22,7 @@ build() {
 		for arch in "${ARCHS[@]}"; do
 			# Generate rootfs
 			mkdir -p "$version_dir/$arch"
-			./cross-docker run -e "TRACE=$TRACE" --rm "$BUILDER_IMAGE" -a "$arch" "${BUILD_OPTIONS[@]}" \
+			docker run -e "TRACE=$TRACE" --rm "$BUILDER_IMAGE" -a "$arch" "${BUILD_OPTIONS[@]}" \
 				> "$version_dir/$arch/rootfs.tar.xz"
 			cp "$version_dir/Dockerfile" "$version_dir/$arch/Dockerfile" # so we can point the builder bots at one directory to build our image. AFAIK docker doesn't follow symlinks
 
