@@ -2,4 +2,4 @@
 /versions/**/rootfs.tar.xz
 
 # Matches all directories (x86, armhf, etc) in each version directory. Does not match files.
-/versions/**/
+# /versions/**/**/

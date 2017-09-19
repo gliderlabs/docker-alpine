@@ -1,53 +1,119 @@
 #!/usr/bin/env bash
 
+build_image() {
+  echo "Building image with options file $1"
+
+  # local file="$1"
+  #
+  # source "$file"
+  # local version_dir arch
+  # version_dir="$(dirname "$file")"
+  # : "${TAGS:?}" "${BUILD_OPTIONS:?}" "${RELEASE:?}"
+  #
+  # arch="x86_64" # amd64 images are built using the builder, others are pulled from upstream tarballs
+  #
+  # # Generate rootfs
+  # mkdir -p "$version_dir/$arch"
+  # docker run -e "TRACE=$TRACE" --rm "$BUILDER_IMAGE" -a "$arch" "${BUILD_OPTIONS[@]}" \
+  #   > "$version_dir/$arch/rootfs.tar.xz"
+  # cp "$version_dir/Dockerfile" "$version_dir/$arch/Dockerfile" # so we can point the builder bots at one directory to build our image. AFAIK docker doesn't follow symlinks
+
+  # Build + tag images
+  for tag in "${TAGS[@]}"; do
+    echo "tagging $tag"
+    # # Currently, we just tag the x86_64 images as they were before, and tag the others with their architecture
+    # # This means that the gliderlabs repos/orgs will not have multi-arch images yet, but they have the options to do so in the future.
+    # if [[ "$arch" = "x86_64" ]]; then
+    #   docker build -t "$tag" "$version_dir/$arch"
+    # else
+    #   docker build -t "$tag-$arch" "$version_dir/$arch"
+    # fi
+    #
+    # if [[ "$CIRCLE_BUILD_NUM" ]]; then
+    #   {
+    #     mkdir -p images \
+    #     && docker tag -f "$tag" "${tag}-${CIRCLE_BUILD_NUM}" \
+    #     && docker save "${tag}-${CIRCLE_BUILD_NUM}" \
+    #       | xz -9e > "images/${tag//\//_}-${CIRCLE_BUILD_NUM}.tar.xz" \
+    #     && docker rmi "${tag}-${CIRCLE_BUILD_NUM}"
+    #   } || true
+    # fi
+  done
+}
+
+check_to_pull() { # Errors if no PULL_URL is found in file
+  if [ -f "$1" ]; then
+    source "$1"
+    echo "$PULL_URL"
+    if [[ "$PULL_URL" == "" ]]; then
+      echo "n"
+      return 1
+    fi
+  else
+    echo "No file found at $1"
+    return 1
+  fi
+}
+
+pull_image() {
+  if check_to_pull "$1"; then
+    echo "Pulling image with options file $1"
+    source "$1"
+    version_dir="$(dirname "$1")"
+    local file="$(basename "$PULL_URL")"
+    echo $file
+    pwd
+    # Generate rootfs
+    mkdir -p "$version_dir/$arch"
+    curl -fSsL "$PULL_URL" > "$version_dir/$arch/rootfs.tar.gz"
+    cp "$version_dir/Dockerfile" "$version_dir/$arch/Dockerfile" # so we can point the builder bots at one directory to build our image. AFAIK docker doesn't follow symlinks
+    sed -i -- 's/.tar.xz/.tar.gz/g' "$version_dir/$arch/Dockerfile"
+
+  else
+    echo "No PULL_URL is found in options file $1"
+    return 1
+  fi
+}
+
 build() {
-	declare build_files="${*:-versions/**/options}"
+	declare options_files="${*:-versions/**/options}"
 
 	[[ "$BUILDER_IMAGE" ]] || {
 		BUILDER_IMAGE="alpine-builder"
 		docker build -t "$BUILDER_IMAGE" builder
 	}
 
-	for file in $build_files; do
-		( # shellcheck source=versions/gliderlabs-3.2/options
-		source "$file"
-		local version_dir
+  for file in ${options_files[@]}; do
+		local release version_dir
+		release="$(basename "$(dirname "$file")")"
 		version_dir="$(dirname "$file")"
-		: "${TAGS:?}" "${BUILD_OPTIONS:?}" "${RELEASE:?}" # Maybe require $ARCHS in the future?
+		local arch_dirs="$version_dir/**/"
 
-		[[ "$ARCHS" ]] || { # compatability with older configs that were only written for x86_64 architectures
-				ARCHS=("x86_64")
-		}
+		: "${release:?}" "${version_dir:?}"
+		# git checkout -B "rootfs/$release" "$current_branch"
 
-		for arch in "${ARCHS[@]}"; do
-			# Generate rootfs
-			mkdir -p "$version_dir/$arch"
-			docker run -e "TRACE=$TRACE" --rm "$BUILDER_IMAGE" -a "$arch" "${BUILD_OPTIONS[@]}" \
-				> "$version_dir/$arch/rootfs.tar.xz"
-			cp "$version_dir/Dockerfile" "$version_dir/$arch/Dockerfile" # so we can point the builder bots at one directory to build our image. AFAIK docker doesn't follow symlinks
+    check_build() { # Checks to either pull or build, then runs
+      if [ ! -f "$1" ]; then
+        return
+      fi
+      check_to_pull "$1" || pull_image "$1" || build_image "$1"
+    }
 
-			# Build + tag images
-			for tag in "${TAGS[@]}"; do
-				# Currently, we just tag the x86_64 images as they were before, and tag the others with their architecture
-				# This means that the gliderlabs repos/orgs will not have multi-arch images yet, but they have the options to do so in the future.
-				if [[ "$arch" = "x86_64" ]]; then
-					docker build -t "$tag" "$version_dir/$arch"
-				else
-					docker build -t "$tag-$arch" "$version_dir/$arch"
-				fi
-
-				if [[ "$CIRCLE_BUILD_NUM" ]]; then
-					{
-						mkdir -p images \
-						&& docker tag -f "$tag" "${tag}-${CIRCLE_BUILD_NUM}" \
-						&& docker save "${tag}-${CIRCLE_BUILD_NUM}" \
-							| xz -9e > "images/${tag//\//_}-${CIRCLE_BUILD_NUM}.tar.xz" \
-						&& docker rmi "${tag}-${CIRCLE_BUILD_NUM}"
-					} || true
-				fi
-			done
-		done )
-
+    built=0 # check if some image has been built
+		# determine if glob has matches
+		if compgen -G "$arch_dirs" > /dev/null; then # e.g. library-3.6/x86_64/options
+			for arch in ${arch_dirs[@]}; do
+        check_build "$arch/options"
+      done
+      built=1
+    fi
+		if [[ -f "$version_dir/options" ]]; then # image is just under version, e.g. library-3.6/options
+			check_build "$version_dir/options"
+      built=1
+		fi
+		if [[ "$built" == "0" ]]; then
+      echo "No option files found for release: $release"
+    fi
 	done
 }
 
