@@ -41,7 +41,7 @@ build_image() {
   done
 }
 
-check_to_pull() { # Errors if no PULL_URL is found in file
+should_pull() { # Errors if no PULL_URL is found in file
   if [ -f "$1" ]; then
     source "$1"
     echo "$PULL_URL"
@@ -56,18 +56,21 @@ check_to_pull() { # Errors if no PULL_URL is found in file
 }
 
 pull_image() {
-  if check_to_pull "$1"; then
+  if should_pull "$1"; then
     echo "Pulling image with options file $1"
     source "$1"
-    version_dir="$(dirname "$1")"
+    dir="$(dirname "$1")"
     local file="$(basename "$PULL_URL")"
-    echo $file
+
+    echo file $file
+    echo "hi"
     pwd
     # Generate rootfs
-    mkdir -p "$version_dir/$arch"
-    curl -fSsL "$PULL_URL" > "$version_dir/$arch/rootfs.tar.gz"
-    cp "$version_dir/Dockerfile" "$version_dir/$arch/Dockerfile" # so we can point the builder bots at one directory to build our image. AFAIK docker doesn't follow symlinks
-    sed -i -- 's/.tar.xz/.tar.gz/g' "$version_dir/$arch/Dockerfile"
+    echo "$dir"
+    mkdir -p "$dir"
+    curl -fSsL "$PULL_URL" > "$dir/rootfs.tar.gz"
+    cp "$dir/Dockerfile" "$dir/original.Dockerfile" # so we can point the builder bots at one directory to build our image. AFAIK docker doesn't follow symlinks
+    sed -i -- 's/.tar.xz/.tar.gz/g' "$dir/Dockerfile"
 
   else
     echo "No PULL_URL is found in options file $1"
@@ -96,7 +99,13 @@ build() {
       if [ ! -f "$1" ]; then
         return
       fi
-      check_to_pull "$1" || pull_image "$1" || build_image "$1"
+      should_pull "$1"
+      echo $?
+      {
+        should_pull "$1" && echo "Pulling"; pull_image "$1";
+      } || {
+        echo "Pulling"; build_image "$1";
+      }
     }
 
     built=0 # check if some image has been built

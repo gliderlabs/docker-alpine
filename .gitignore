@@ -3,3 +3,14 @@
 
 # Matches all directories (x86, armhf, etc) in each version directory. Does not match files.
 # /versions/**/**/
+# versions/**
+# /versions/**/
+# !versions/**/Dockerfile
+# !versions/**/option
+
+# Ignore everything under 'versions/'...
+versions/*
+
+# ...except 'options' and 'Dockerfile'
+!versions/**/options
+!versions/**/Dockerfile
