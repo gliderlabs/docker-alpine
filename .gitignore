@@ -1,15 +1,7 @@
 /images
-/versions/**/rootfs.tar.xz
 
-# Matches all directories (x86, armhf, etc) in each version directory. Does not match files.
-# /versions/**/**/
-# versions/**
-# /versions/**/
-# !versions/**/Dockerfile
-# !versions/**/option
-
-# Ignore everything under 'versions/'...
-versions/*
+# Ignore everything under 'versions/'... (rootfs.tar.xz, etc)
+/versions/**/
 
 # ...except 'options' and 'Dockerfile'
 !versions/**/options
