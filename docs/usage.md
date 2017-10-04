@@ -11,7 +11,7 @@ An example installing the `nginx` package would be `apk add --update nginx`. The
 Here is a full example `Dockerfile` that installs the Python runtime and some build dependencies:
 
 ```
-FROM gliderlabs/alpine:3.3
+FROM gliderlabs/alpine:3.6
 
 RUN apk add --update \
     python \
@@ -32,10 +32,10 @@ CMD ["/env/bin/python", "main.py"]
 
 ## Disabling Cache
 
-As of Alpine Linux 3.3 there exists a new `--no-cache` option for `apk`. It allows users to install packages with an index that is updated and used on-the-fly and not cached locally:
+As of Alpine Linux 3.3 there exists a new `--no-cache` option for `apk`. It allows users to install packages with an index that is updated and used on-the-fly and not cached locally. Note the example uses below uses version 3.6 but is backwards compatible to version 3.3:
 
 ```
-FROM gliderlabs/alpine:3.3
+FROM gliderlabs/alpine:3.6
 
 RUN apk --no-cache add nginx
 
@@ -50,7 +50,7 @@ This avoids the need to use `--update` and remove `/var/cache/apk/*` when done i
 The `gliderlabs` variant of this image contains a small unofficial wrapper script that assists in the cleanup of the package index after installing packages. A great minimalist cleans up after ones self. Thus, the `apk-install` script was born. Here is another simple `Dockerfile` that installs the `nginx` package and removes package index data:
 
 ```
-FROM gliderlabs/alpine:3.3
+FROM gliderlabs/alpine:3.6
 
 RUN apk-install nginx
 
@@ -65,7 +65,7 @@ This convenience script is not available in the official Docker Library Alpine L
 Another great `apk add` feature for cleanup is the concept of virtual packages using the `--virtual` or `-t` switch. Packages added under this virtual name can then be removed as one group. An example use of this would be removing a group of build dependencies all at once:
 
 ```
-FROM gliderlabs/alpine:3.3
+FROM gliderlabs/alpine:3.6
 
 WORKDIR /myapp
 COPY . /myapp
