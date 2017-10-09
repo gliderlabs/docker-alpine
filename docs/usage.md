@@ -32,7 +32,7 @@ CMD ["/env/bin/python", "main.py"]
 
 ## Disabling Cache
 
-As of Alpine Linux 3.3 there exists a new `--no-cache` option for `apk`. It allows users to install packages with an index that is updated and used on-the-fly and not cached locally. Note the example uses below uses version 3.6 but is backwards compatible to version 3.3:
+As of Alpine Linux 3.3 there exists a new `--no-cache` option for `apk`. It allows users to install packages with an index that is updated and used on-the-fly and not cached locally. Note the example below uses version 3.6 but is backwards compatible to version 3.3:
 
 ```
 FROM gliderlabs/alpine:3.6
