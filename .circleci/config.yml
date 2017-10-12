@@ -1,0 +1,44 @@
+version: 2
+jobs:
+  build:
+    parallelism: 4
+    branches:
+      ignore:
+        - /rootfs\/.*/
+    docker:
+      - image: docker:17.03.0-ce
+    steps:
+      - setup_remote_docker:
+          version: 17.03.0-ce
+      - checkout
+      - restore_cache:
+          key: deps
+      - run:
+          name: install bash
+          command: apk --no-cache add bash
+      - run:
+          name: install bats
+          command: |
+            if [[ ! -e ~/deps/bats_v0.4.0.tar.gz ]]; then mkdir -p ~/deps; curl -sSL -o ~/deps/bats_v0.4.0.tar.gz https://github.com/sstephenson/bats/archive/v0.4.0.tar.gz; fi
+            tar -xf ~/deps/bats_v0.4.0.tar.gz
+            bats-0.4.0/install.sh /usr/local
+      - save_cache:
+          key: deps
+          paths:
+            - ~/deps
+      - run:
+          name: build images
+          command: ./build $(circleci tests glob versions/**/options | circleci tests split)
+      - run:
+          name: test images
+          command: ./build test $(circleci tests glob versions/**/options | circleci tests split)
+      - run:
+          name: push images
+          command: |
+            if [[ "$CIRCLE_BRANCH" == "release" ]]; then docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASSWORD; fi
+            ./build push $(circleci tests glob versions/**/options | circleci tests split)
+      - run:
+          name: commit artifacts
+          command: ./build commit $(circleci tests glob versions/**/options | circleci tests split)
+      - store_artifacts:
+          path: images
