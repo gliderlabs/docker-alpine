@@ -1,51 +1,57 @@
 #!/usr/bin/env bash
 
-build() {
-	declare build_files="${*:-versions/**/options}"
+shopt -s globstar
+
+image_pull() {
+	local pull_url file dir
+  pull_url="$1"
+	dir="$2"
+	file="${pull_url##*/}"
+
+	curl -fSsL "$pull_url" > "$dir/rootfs.tar.gz"
+}
+
+image_build() {
+	local build_options dir
+	build_options="$1"
+	dir="$2"
 
 	[[ "$BUILDER_IMAGE" ]] || {
 		BUILDER_IMAGE="alpine-builder"
 		docker build -t "$BUILDER_IMAGE" builder
 	}
 
-	for file in $build_files; do
+	docker run -e "TRACE=$TRACE" --rm "$BUILDER_IMAGE" "${BUILD_OPTIONS[@]}" \
+		> "$version_dir/rootfs.tar.xz"
+}
+
+build() {
+	declare options_files="${*:-versions/**/options}"
+
+	for file in $options_files; do
 		( # shellcheck source=versions/gliderlabs-3.2/options
 		source "$file"
 		local version_dir
-		version_dir="$(dirname "$file")"
-		: "${TAGS:?}" "${BUILD_OPTIONS:?}" "${RELEASE:?}" # Maybe require $ARCHS in the future?
+		version_dir="${file%/*}"
+		arch="${ARCH:-x86_64}"
+		: "${TAGS:?}"
 
-		[[ "$ARCHS" ]] || { # compatability with older configs that were only written for x86_64 architectures
-				ARCHS=("x86_64")
-		}
+		[[ "$PULL_URL" ]] && image_pull "$PULL_URL" "$version_dir"
+		[[ "$BUILD_OPTIONS" ]] && image_build "${BUILD_OPTIONS[@]}" "$version_dir"
 
-		for arch in "${ARCHS[@]}"; do
-			# Generate rootfs
-			mkdir -p "$version_dir/$arch"
-			docker run -e "TRACE=$TRACE" --rm "$BUILDER_IMAGE" -a "$arch" "${BUILD_OPTIONS[@]}" \
-				> "$version_dir/$arch/rootfs.tar.xz"
-			cp "$version_dir/Dockerfile" "$version_dir/$arch/Dockerfile" # so we can point the builder bots at one directory to build our image. AFAIK docker doesn't follow symlinks
+		# Build + tag images
+		for tag in "${TAGS[@]}"; do
+			docker build -t "$tag" "$version_dir"
 
-			# Build + tag images
-			for tag in "${TAGS[@]}"; do
-				# Currently, we just tag the x86_64 images as they were before, and tag the others with their architecture
-				# This means that the gliderlabs repos/orgs will not have multi-arch images yet, but they have the options to do so in the future.
-				if [[ "$arch" = "x86_64" ]]; then
-					docker build -t "$tag" "$version_dir/$arch"
-				else
-					docker build -t "$tag-$arch" "$version_dir/$arch"
-				fi
-
-				if [[ "$CIRCLE_BUILD_NUM" ]]; then
-					{
-						mkdir -p images \
-						&& docker tag -f "$tag" "${tag}-${CIRCLE_BUILD_NUM}" \
-						&& docker save "${tag}-${CIRCLE_BUILD_NUM}" \
-							| xz -9e > "images/${tag//\//_}-${CIRCLE_BUILD_NUM}.tar.xz" \
-						&& docker rmi "${tag}-${CIRCLE_BUILD_NUM}"
-					} || true
-				fi
-			done
+			if [[ "$CIRCLE_BUILD_NUM" ]]; then
+				{
+					mkdir -p images \
+					&& docker tag -f "$tag" "${tag}-${CIRCLE_BUILD_NUM}" \
+					&& docker save "${tag}-${CIRCLE_BUILD_NUM}" \
+						| xz -9e > "images/${tag//\//_}-${CIRCLE_BUILD_NUM}.tar.xz" \
+					&& docker rmi "${tag}-${CIRCLE_BUILD_NUM}"
+				} || true
+			fi
 		done )
 
 	done
@@ -54,7 +60,7 @@ build() {
 commit() {
 	[[ "$CIRCLE_BRANCH" == "release" ]] || return 0
 
-	declare options_files="versions/**/options"
+	declare options_files="${*:-versions/**/options}"
 	local build_num="${CIRCLE_BUILD_NUM:-nobuild}"
 	local current_branch
 	current_branch=$(git rev-parse --abbrev-ref HEAD)
@@ -62,23 +68,13 @@ commit() {
 
 	for file in $options_files; do
 		local release version_dir
-		release="$(basename "$(dirname "$file")")"
-		version_dir="$(dirname "$file")"
-		local release_dirs="$version_dir/**/"
+		version_dir="${file%/*}"
+		release="${version_dir##versions/}"
 
 		: "${release:?}" "${version_dir:?}"
+
 		git checkout -B "rootfs/$release" "$current_branch"
-
-		# determine if glob has matches
-		if compgen -G "$release_dirs" > /dev/null; then
-			git add -f -- $release_dirs
-		elif [[ -e "$version_dir/rootfs.tar.xz" ]]; then
-			git add -f -- "$version_dir/rootfs.tar.xz"
-		else
-			echo "No files found for release: $release"
-			continue
-		fi
-
+		git add -f -- "$version_dir/rootfs.tar.*"
 		git commit -m "release image version $release for build $build_num"
 	done
 
@@ -87,24 +83,26 @@ commit() {
 }
 
 run_tests() {
-	declare build_files="${*:-versions/**/options}"
+	declare options_files="${*:-versions/**/options}"
 	declare -a test_files
-	for file in $build_files; do
+	for file in $options_files; do
 		# shellcheck source=versions/gliderlabs-3.2/options
 		source "$file"
 		local tag
 		tag="${TAGS[0]}" tag="${tag//:/-}" tag="${tag//\//_}"
-		test_files+=("test/test_${tag}.bats")
+		test_file="test/test_${tag}.bats"
+		[[ -f "$test_file" ]] && test_files+=("$test_file") || echo " - skipping test for ${tag}: no test file ${test_file}"
 	done
-	bats "${test_files[@]}"
+
+	[[ "${test_files[@]}" ]] && bats "${test_files[@]}"
 }
 
 push() {
 	[[ "$CIRCLE_BRANCH" == "release" ]] || return 0
 	[[ "$NO_PUSH" ]] && return 0
 
-	declare build_files="${*:-versions/**/options}"
-	for file in $build_files; do
+	declare options_files="${*:-versions/**/options}"
+	for file in $options_files; do
 		( #shellcheck source=versions/gliderlabs-3.2/options
 		source "$file"
 		for tag in "${TAGS[@]}"; do
@@ -116,7 +114,9 @@ push() {
 	done
 }
 
+# TODO: make this work...
 library() {
+	declare options_files="${*:-versions/library-*/**/options}" # does this need globstar?
 
 	convert() {
 		# takes a space-separated list of alpine-linux architectures, and returns a space-separated list of docker architectures
@@ -147,15 +147,16 @@ library() {
 	for file in versions/library-*/options; do
 		# shellcheck source=versions/library-3.2/options
 		source "$file"
-		local refs
-		refs="$(git ls-remote --exit-code --heads origin rootfs/library-${RELEASE#v})"
+		local refs version_dir release
+		version_dir="${file%/*}"
+		release="${version_dir##versions/}"
+		refs="$(git ls-remote --exit-code --heads origin rootfs/${release})"
 		: "${refs:?}"
 		tags="${TAGS[*]}"
 		[[ "${ARCHS[*]}" ]] || { # compatability with older configs that were only written for x86_64 architectures
 				ARCHS=("x86_64")
 		}
 		a="$(convert "${ARCHS[@]}")"
-		release="$(basename "$(dirname "$file")")"
 
 		echo
 		echo "Tags: ${tags// /, }"

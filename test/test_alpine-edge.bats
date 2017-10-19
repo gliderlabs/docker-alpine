@@ -42,4 +42,3 @@ setup() {
   run docker run --user nobody "alpine:edge" su
   [ $status -eq 1 ]
 }
-
