@@ -15,7 +15,7 @@ jobs:
           key: deps
       - run:
           name: install bash
-          command: apk --no-cache add bash
+          command: apk --no-cache add bash git openssh-client
       - run:
           name: install bats
           command: |
