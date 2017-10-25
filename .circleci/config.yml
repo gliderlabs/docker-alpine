@@ -27,17 +27,21 @@ jobs:
           paths:
             - ~/deps
       - run:
+          shell: /bin/bash -eo pipefail -O globstar
           name: build images
           command: ./build $(circleci tests glob versions/**/options | circleci tests split)
       - run:
+          shell: /bin/bash -eo pipefail -O globstar
           name: test images
           command: ./build test $(circleci tests glob versions/**/options | circleci tests split)
       - run:
+          shell: /bin/bash -eo pipefail -O globstar
           name: push images
           command: |
             if [[ "$CIRCLE_BRANCH" == "release" ]]; then docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASSWORD; fi
             ./build push $(circleci tests glob versions/**/options | circleci tests split)
       - run:
+          shell: /bin/bash -eo pipefail -O globstar
           name: commit artifacts
           command: ./build commit $(circleci tests glob versions/**/options | circleci tests split)
       - store_artifacts:
