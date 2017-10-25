@@ -11,6 +11,7 @@ jobs:
       - setup_remote_docker:
           version: 17.03.0-ce
       - checkout
+      - add_ssh_keys
       - restore_cache:
           key: deps
       - run:
