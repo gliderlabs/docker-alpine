@@ -114,10 +114,7 @@ push() {
 	done
 }
 
-# TODO: make this work...
 library() {
-	declare options_files="${*:-versions/library-*/**/options}" # does this need globstar?
-
 	convert() {
 		# takes a space-separated list of alpine-linux architectures, and returns a space-separated list of docker architectures
 		local i=0
@@ -129,7 +126,7 @@ library() {
 				aarch64) echo -n "arm64v8";;
 				ppc64le) echo -n "ppc64le";;
 				s390x) echo -n "s390x";;
-				*) return 1;; # Fail on unknown archs
+				*) echo >&2 "error: unknown arch '$arch'"; return 1;; # Fail on unknown archs
 			esac
 			if [[ i -ne $#-1 ]]; then
 				echo -n " "
@@ -144,18 +141,24 @@ library() {
 	echo "Maintainers: Glider Labs <team@gliderlabs.com> (@gliderlabs)"
 	echo "GitRepo: https://github.com/gliderlabs/docker-alpine.git"
 
-	for file in versions/library-*/options; do
+	for file in versions/library-*/x86_64/options versions/library-*/options; do
 		# shellcheck source=versions/library-3.2/options
 		source "$file"
 		local refs version_dir release
-		version_dir="${file%/*}"
-		release="${version_dir##versions/}"
+		version_dir="${file%/options}"
+		version_dir="${version_dir%/x86_64}"
+		release="${version_dir#versions/}"
 		refs="$(git ls-remote --exit-code --heads origin rootfs/${release})"
 		: "${refs:?}"
 		tags="${TAGS[*]}"
-		[[ "${ARCHS[*]}" ]] || { # compatability with older configs that were only written for x86_64 architectures
-				ARCHS=("x86_64")
-		}
+		if [ -e "$version_dir/options" ]; then
+			# compatability with older configs that were only written for x86_64 architectures
+			ARCHS=("x86_64")
+		else
+			ARCHS=( "$version_dir"/*/options )
+			ARCHS=( "${ARCHS[@]#$version_dir/}" )
+			ARCHS=( "${ARCHS[@]%/*}" )
+		fi
 		a="$(convert "${ARCHS[@]}")"
 
 		echo
@@ -168,7 +171,12 @@ library() {
 		for arch in $a; do
 			# ${ARCHS[i]} is the alpine version string, different from $archs, the docker version string.
 			# Our folder structure is based on the alpine version string
-			echo "$arch-Directory: versions/library-${RELEASE#v}/${ARCHS[i]}"
+			if [ -e "$version_dir/options" ]; then
+				# compatability with older configs that were only written for x86_64 architectures
+				echo "$arch-Directory: $version_dir"
+			else
+				echo "$arch-Directory: $version_dir/${ARCHS[i]}"
+			fi
 			let i=i+1
 		done
 	done
