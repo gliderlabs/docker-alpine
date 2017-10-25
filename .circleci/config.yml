@@ -17,6 +17,9 @@ jobs:
           name: install bash
           command: apk --no-cache add bash git openssh-client
       - run:
+          name: avoid hosts unknown for github
+          command: mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+      - run:
           name: install bats
           command: |
             if [[ ! -e ~/deps/bats_v0.4.0.tar.gz ]]; then mkdir -p ~/deps; curl -sSL -o ~/deps/bats_v0.4.0.tar.gz https://github.com/sstephenson/bats/archive/v0.4.0.tar.gz; fi
