@@ -1,4 +1,4 @@
-FROM alpine:3.2
-COPY scripts/mkimage-alpine.bash scripts/apk-install /
-RUN /apk-install bash tzdata xz
+FROM alpine:latest
+COPY scripts/mkimage-alpine.bash /
+RUN apk add --no-cache bash tzdata xz
 ENTRYPOINT ["/mkimage-alpine.bash"]
