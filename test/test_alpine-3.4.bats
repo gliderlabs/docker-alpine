@@ -53,3 +53,8 @@ setup() {
   [ $status -eq 0 ]
 }
 
+@test "/dev/null should be missing" {
+  run sh -c "docker export $(docker create alpine:3.6) | tar -t dev/null"
+  [ "$output" != "dev/null" ]
+  [ $status -ne 0 ]
+}

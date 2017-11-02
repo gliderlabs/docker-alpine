@@ -42,3 +42,9 @@ setup() {
   run docker run --user nobody "alpine:edge" su
   [ $status -eq 1 ]
 }
+
+@test "/dev/null should be missing" {
+  run sh -c "docker export $(docker create alpine:3.6) | tar -t dev/null"
+  [ "$output" != "dev/null" ]
+  [ $status -ne 0 ]
+}

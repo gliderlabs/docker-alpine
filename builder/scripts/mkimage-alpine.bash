@@ -53,7 +53,7 @@ build() {
 	[[ "$ADD_APK_SCRIPT" ]] && cp /apk-install "$rootfs/usr/sbin/apk-install"
 
 	# save
-	tar -J -f rootfs.tar.xz --numeric-owner -C "$rootfs" -c .
+	tar -J -f rootfs.tar.xz --numeric-owner --exclude='dev/*' -C "$rootfs" -c .
 	[[ "$STDOUT" ]] && cat rootfs.tar.xz
 
 	return 0
