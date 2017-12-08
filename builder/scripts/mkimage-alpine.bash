@@ -43,9 +43,14 @@ build() {
 		[[ "$ADD_BASELAYOUT" ]] && \
 			apk --root "$rootfs" --keys-dir /etc/apk/keys \
 				fetch --stdout --arch $arch alpine-base | tar -xvz -C "$rootfs" etc
+		[[ "$TIMEZONE" ]] && {
+			apk --root "$rootfs" --keys-dir /etc/apk/keys \
+				add --arch $arch -t .timezone tzdata
+			cp "$rootfs/usr/share/zoneinfo/$TIMEZONE" "$rootfs/etc/localtime"
+			apk --root "$rootfs" --keys-dir /etc/apk/keys \
+				del --arch $arch --purge .timezone
+		}
 		rm -f "$rootfs/var/cache/apk"/*
-		[[ "$TIMEZONE" ]] && \
-			cp "/usr/share/zoneinfo/$TIMEZONE" "$rootfs/etc/localtime"
 		[[ "$DISABLE_ROOT_PASSWD" ]] && \
 			sed -ie 's/^root::/root:!:/' "$rootfs/etc/shadow"
 	} >&2
