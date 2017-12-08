@@ -45,10 +45,10 @@ build() {
 				fetch --stdout --arch $arch alpine-base | tar -xvz -C "$rootfs" etc
 		[[ "$TIMEZONE" ]] && {
 			apk --root "$rootfs" --keys-dir /etc/apk/keys \
-				add --arch $arch tzdata
+				add --arch $arch -t .timezone tzdata
 			cp "$rootfs/usr/share/zoneinfo/$TIMEZONE" "$rootfs/etc/localtime"
 			apk --root "$rootfs" --keys-dir /etc/apk/keys \
-				del --arch $arch --purge tzdata
+				del --arch $arch --purge .timezone
 		}
 		rm -f "$rootfs/var/cache/apk"/*
 		[[ "$DISABLE_ROOT_PASSWD" ]] && \
