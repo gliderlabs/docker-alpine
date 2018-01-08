@@ -1,3 +1,4 @@
-export ARCH="x86"
-export PULL_URL="http://dl-cdn.alpinelinux.org/alpine/edge/releases/${ARCH}/alpine-minirootfs-3.6.0-${ARCH}.tar.gz"
+fs_version=3.7.0
+export ARCH="aarch64"
+export PULL_URL="http://dl-cdn.alpinelinux.org/alpine/edge/releases/${ARCH}/alpine-minirootfs-${fs_version}-${ARCH}.tar.gz"
 export TAGS=(alpine:edge-${ARCH})
