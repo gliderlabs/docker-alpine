@@ -6,7 +6,7 @@ setup() {
   run docker run gliderlabs/alpine:edge cat /etc/os-release
   [ $status -eq 0 ]
   case "${lines[2]}" in
-    VERSION_ID=3.7*) true;;
+    VERSION_ID=3.8*) true;;
     *) false;;
   esac
 }
