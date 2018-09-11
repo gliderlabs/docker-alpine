@@ -1,4 +1,4 @@
-version=3.7.0
+version=3.7.1
 export ARCH="x86"
 export PULL_URL="http://dl-cdn.alpinelinux.org/alpine/v${version%.*}/releases/${ARCH}/alpine-minirootfs-${version}-${ARCH}.tar.gz"
 export TAGS=(alpine:${version%.*}-${ARCH} alpine:latest-${ARCH})
