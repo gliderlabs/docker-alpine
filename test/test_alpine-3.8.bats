@@ -5,7 +5,7 @@ setup() {
 @test "version is correct" {
   run docker run alpine:3.8 cat /etc/os-release
   [ $status -eq 0 ]
-  [ "${lines[2]}" = "VERSION_ID=3.8.0" ]
+  [ "${lines[2]}" = "VERSION_ID=3.8.1" ]
 }
 
 @test "package installs cleanly" {
