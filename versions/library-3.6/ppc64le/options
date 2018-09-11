@@ -1,6 +1,3 @@
-export RELEASE="v3.6"
 export ARCH="ppc64le"
-export MIRROR="http://dl-cdn.alpinelinux.org/alpine"
-export PACKAGES="alpine-baselayout,busybox,alpine-keys,apk-tools,libc-utils"
-export BUILD_OPTIONS=(-b -s -t UTC -r $RELEASE -m $MIRROR -p $PACKAGES -a $ARCH)
+export PULL_URL="http://dl-cdn.alpinelinux.org/alpine/v3.6/releases/${ARCH}/alpine-minirootfs-3.6.2-${ARCH}.tar.gz"
 export TAGS=(alpine:3.6-${ARCH})
