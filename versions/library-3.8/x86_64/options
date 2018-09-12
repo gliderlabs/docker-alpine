@@ -2,4 +2,4 @@ export RELEASE="v3.8"
 export MIRROR="http://dl-cdn.alpinelinux.org/alpine"
 export PACKAGES="alpine-baselayout,busybox,alpine-keys,apk-tools,libc-utils"
 export BUILD_OPTIONS=(-b -s -t UTC -r $RELEASE -m $MIRROR -p $PACKAGES)
-export TAGS=(alpine:3.8 alpine:latest)
+export TAGS=(alpine:3.8)
