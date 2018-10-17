@@ -16,7 +16,7 @@ jobs:
           key: deps
       - run:
           name: install bash
-          command: apk --no-cache add bash git openssh-client
+          command: apk --no-cache add bash git openssh-client xz
       - run:
           name: avoid hosts unknown for github
           command: mkdir -p ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
