@@ -46,7 +46,7 @@ build() {
 			if [[ "$CIRCLE_BUILD_NUM" ]]; then
 				{
 					mkdir -p images \
-					&& docker tag -f "$tag" "${tag}-${CIRCLE_BUILD_NUM}" \
+					&& docker tag "$tag" "${tag}-${CIRCLE_BUILD_NUM}" \
 					&& docker save "${tag}-${CIRCLE_BUILD_NUM}" \
 						| xz -9e > "images/${tag//\//_}-${CIRCLE_BUILD_NUM}.tar.xz" \
 					&& docker rmi "${tag}-${CIRCLE_BUILD_NUM}"
