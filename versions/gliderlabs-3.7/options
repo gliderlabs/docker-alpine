@@ -1,6 +1,6 @@
-export RELEASE="v3.6"
+export RELEASE="v3.7"
 export MIRROR="http://alpine.gliderlabs.com/alpine"
 export PACKAGES="alpine-baselayout,alpine-keys,apk-tools,libc-utils"
 export BUILD_OPTIONS=(-b -s -c -t UTC -r $RELEASE -m $MIRROR -p $PACKAGES)
-export TAGS=(gliderlabs/alpine:3.6)
+export TAGS=(gliderlabs/alpine:3.7)
 export PUSH_IMAGE="true"
