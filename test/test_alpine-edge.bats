@@ -6,7 +6,7 @@ setup() {
   run docker run "alpine:edge" cat /etc/os-release
   [ $status -eq 0 ]
   case "${lines[2]}" in
-    VERSION_ID=3.8*) true;;
+    VERSION_ID=3.9*) true;;
     *) false;;
   esac
 }
