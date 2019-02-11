@@ -122,7 +122,8 @@ library() {
 			case "$arch" in # converts Alpine Linux arch strings to Docker arch strings
 				x86_64) echo -n "amd64";;
 				x86) echo -n "i386";;
-				armhf) echo -n "arm32v6";; # arm32v7 is not officially supported by Alpine, but arm32v6 should still work.
+				armhf) echo -n "arm32v6";;
+				armv7) echo -n "arm32v7";;
 				aarch64) echo -n "arm64v8";;
 				ppc64le) echo -n "ppc64le";;
 				s390x) echo -n "s390x";;
