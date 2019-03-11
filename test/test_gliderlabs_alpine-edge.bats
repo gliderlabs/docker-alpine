@@ -12,7 +12,7 @@ setup() {
 }
 
 @test "package installs cleanly" {
-  run docker run gliderlabs/alpine:edge apk add --update openssl
+  run docker run gliderlabs/alpine:edge apk add --update-cache openssl
   [ $status -eq 0 ]
 }
 

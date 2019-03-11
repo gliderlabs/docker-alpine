@@ -22,7 +22,7 @@ Docker images today are big. Usually much larger than they need to be. There are
 
 ## Usage
 
-You use the `apk` command to manage packages. We don't ship the image with a package index (since that can go stale fairly quickly), so you need to add the `--update` flag to `apk` when installing. An example installing the `nginx` package would be `apk add --update nginx`. Check out [the usage page][usage] for more advanced usage and `Dockerfile` examples.
+You use the `apk` command to manage packages. We don't ship the image with a package index (since that can go stale fairly quickly), so you need to add the `--update-cache` flag to `apk` when installing. An example installing the `nginx` package would be `apk add --update-cache nginx`. Check out [the usage page][usage] for more advanced usage and `Dockerfile` examples.
 
 ## Caveats
 

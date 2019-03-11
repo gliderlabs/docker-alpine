@@ -9,7 +9,7 @@ setup() {
 }
 
 @test "package installs cleanly" {
-  run docker run alpine:3.4 apk add --update openssl
+  run docker run alpine:3.4 apk add --update-cache openssl
   [ $status -eq 0 ]
 }
 
