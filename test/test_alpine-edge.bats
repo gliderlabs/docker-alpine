@@ -6,13 +6,13 @@ setup() {
   run docker run "alpine:edge" cat /etc/os-release
   [ $status -eq 0 ]
   case "${lines[2]}" in
-    VERSION_ID=3.9*) true;;
+    VERSION_ID=3.12*) true;;
     *) false;;
   esac
 }
 
 @test "package installs cleanly" {
-  run docker run "alpine:edge" apk add --update openssl
+  run docker run "alpine:edge" apk add --update-cache openssl
   [ $status -eq 0 ]
 }
 

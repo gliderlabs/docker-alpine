@@ -5,11 +5,11 @@ setup() {
 @test "version is correct" {
   run docker run gliderlabs/alpine:3.8 cat /etc/os-release
   [ $status -eq 0 ]
-  [ "${lines[2]}" = "VERSION_ID=3.8.2" ]
+  [ "${lines[2]}" = "VERSION_ID=3.8.5" ]
 }
 
 @test "package installs cleanly" {
-  run docker run gliderlabs/alpine:3.8 apk add --update openssl
+  run docker run gliderlabs/alpine:3.8 apk add --update-cache openssl
   [ $status -eq 0 ]
 }
 

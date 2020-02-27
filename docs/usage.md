@@ -4,7 +4,7 @@
 
 Replacing your current base image with the Docker Alpine Linux image usually requires updating the package names to the corresponding ones in the [Alpine Linux package index][packageindex]. We use the `apk` command to manage packages. It works similar to `apt` or `yum`.
 
-An example installing the `nginx` package would be `apk add --update nginx`. The `--update` flag fetches the current package index before adding the package. We don't ship the image with a package index (since that can go stale fairly quickly).
+An example installing the `nginx` package would be `apk add --update-cache nginx`. The `--update-cache` flag fetches the current package index before adding the package. We don't ship the image with a package index (since that can go stale fairly quickly).
 
 ## Example
 
@@ -13,7 +13,7 @@ Here is a full example `Dockerfile` that installs the Python runtime and some bu
 ```
 FROM gliderlabs/alpine:3.3
 
-RUN apk add --update \
+RUN apk add --update-cache \
     python \
     python-dev \
     py-pip \
@@ -43,7 +43,7 @@ EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
 ```
 
-This avoids the need to use `--update` and remove `/var/cache/apk/*` when done installing packages.
+This avoids the need to use `--update-cache` and remove `/var/cache/apk/*` when done installing packages.
 
 ## Convenience Cleanup
 
@@ -59,8 +59,8 @@ FROM gliderlabs/alpine:3.3
 WORKDIR /myapp
 COPY . /myapp
 
-RUN apk --update add python py-pip openssl ca-certificates
-RUN apk --update add --virtual build-dependencies python-dev build-base wget \
+RUN apk --update-cache add python py-pip openssl ca-certificates
+RUN apk --update-cache add --virtual build-dependencies python-dev build-base wget \
   && pip install -r requirements.txt \
   && python setup.py install \
   && apk del build-dependencies
