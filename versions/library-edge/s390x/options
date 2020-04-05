@@ -1,4 +1,4 @@
-fs_version=3.7.0
-export ARCH="aarch64"
+fs_version=edge
+export ARCH="s390x"
 export PULL_URL="http://dl-cdn.alpinelinux.org/alpine/edge/releases/${ARCH}/alpine-minirootfs-${fs_version}-${ARCH}.tar.gz"
 export TAGS=(alpine:edge-${ARCH})
